@@ -1,9 +1,12 @@
 """FastAPI application for SIRA."""
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from datetime import datetime
 
 from src.core.config import settings
 from src.core.logging import get_logger
+from src.core.exceptions import SIRAException
 from src.api.schemas import (
     QueryRequest, QueryResponse, SessionResponse,
     SessionHistoryResponse, HealthResponse
@@ -35,6 +38,49 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Global exception handlers
+@app.exception_handler(SIRAException)
+async def sira_exception_handler(request: Request, exc: SIRAException):
+    """Handle SIRA custom exceptions."""
+    logger.error(
+        "sira_exception",
+        extra={
+            "error": exc.message,
+            "details": exc.details,
+            "path": request.url.path
+        }
+    )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "error": exc.message,
+            "details": exc.details,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    )
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected exceptions."""
+    logger.error(
+        "unexpected_exception",
+        extra={
+            "error": str(exc),
+            "error_type": type(exc).__name__,
+            "path": request.url.path
+        }
+    )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "error": "An unexpected error occurred",
+            "detail": str(exc),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    )
 
 
 @app.on_event("startup")
