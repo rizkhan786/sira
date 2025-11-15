@@ -28,6 +28,8 @@ class QueryMetadata(BaseModel):
     quality_score: Optional[float] = Field(None, description="Quality score (0.0-1.0)")
     quality_level: Optional[str] = Field(None, description="Quality level (poor/acceptable/good/excellent)")
     quality_breakdown: Optional[Dict[str, Any]] = Field(None, description="Detailed quality breakdown")
+    pattern_extracted: Optional[bool] = Field(None, description="Whether a pattern was extracted")
+    pattern_id: Optional[str] = Field(None, description="ID of extracted pattern if any")
 
 
 class QueryResponse(BaseModel):

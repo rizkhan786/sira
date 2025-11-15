@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from datetime import datetime, timezone
 from src.llm.client import get_llm_client
 from src.quality.scorer import QualityScorer
+from src.patterns.extractor import PatternExtractor
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -14,6 +15,10 @@ class ReasoningEngine:
     def __init__(self):
         self.llm_client = get_llm_client()
         self.quality_scorer = QualityScorer()
+        self.pattern_extractor = PatternExtractor(
+            llm_service=self.llm_client,
+            config={}
+        )
         
     async def process_query(
         self,
@@ -53,6 +58,19 @@ class ReasoningEngine:
                 reasoning_steps=reasoning_steps
             )
             
+            # Extract pattern if quality is high enough
+            pattern = None
+            if quality_result["quality_score"] >= self.pattern_extractor.QUALITY_THRESHOLD:
+                pattern = await self.pattern_extractor.extract_pattern(
+                    query=query,
+                    response=response["text"],
+                    quality_score=quality_result["quality_score"],
+                    quality_breakdown={
+                        "rule_based": quality_result["rule_based"],
+                        "llm_based": quality_result["llm_based"]
+                    }
+                )
+            
             result = {
                 "response": response["text"],
                 "reasoning_steps": reasoning_steps,
@@ -67,8 +85,11 @@ class ReasoningEngine:
                     "quality_breakdown": {
                         "rule_based": quality_result["rule_based"],
                         "llm_based": quality_result["llm_based"]
-                    }
-                }
+                    },
+                    "pattern_extracted": pattern is not None,
+                    "pattern_id": pattern["pattern_id"] if pattern else None
+                },
+                "extracted_pattern": pattern  # Include pattern for storage
             }
             
             logger.info(
