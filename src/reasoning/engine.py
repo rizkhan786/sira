@@ -5,6 +5,7 @@ from src.llm.client import get_llm_client
 from src.quality.scorer import QualityScorer
 from src.patterns.extractor import PatternExtractor
 from src.patterns.storage import PatternStorage
+from src.patterns.retrieval import PatternRetriever
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -21,6 +22,7 @@ class ReasoningEngine:
             config={}
         )
         self.pattern_storage = PatternStorage()
+        self.pattern_retriever = PatternRetriever(self.pattern_storage)
         
     async def process_query(
         self,
@@ -43,6 +45,21 @@ class ReasoningEngine:
         start_time = datetime.now(timezone.utc)
         
         try:
+            # Retrieve similar patterns before reasoning
+            retrieved_patterns = self.pattern_retriever.retrieve_patterns(
+                query=query,
+                n_results=3,
+                min_quality=0.7,
+                min_similarity=0.5
+            )
+            
+            # Add patterns to context
+            if retrieved_patterns:
+                if context is None:
+                    context = {}
+                context['retrieved_patterns'] = retrieved_patterns
+                context['pattern_guidance'] = self.pattern_retriever.format_patterns_for_prompt(retrieved_patterns)
+            
             # Generate reasoning steps
             reasoning_steps = await self._generate_reasoning_steps(query, context)
             
@@ -95,7 +112,8 @@ class ReasoningEngine:
                     },
                     "pattern_extracted": pattern is not None,
                     "pattern_id": pattern["pattern_id"] if pattern else None,
-                    "pattern_stored": pattern_stored
+                    "pattern_stored": pattern_stored,
+                    "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0
                 },
                 "extracted_pattern": pattern  # Include pattern for storage
             }
@@ -168,8 +186,13 @@ class ReasoningEngine:
         prompt = f"""You are a reasoning assistant. Break down the following query into clear, logical reasoning steps.
 
 Query: {query}
-
-Provide 3-5 reasoning steps in this exact format:
+"""
+        
+        # Add pattern guidance if available
+        if context and context.get('pattern_guidance'):
+            prompt += f"\n\n{context['pattern_guidance']}\n"
+        
+        prompt += """\nProvide 3-5 reasoning steps in this exact format:
 1. [Step description]
 2. [Step description]
 3. [Step description]

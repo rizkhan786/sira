@@ -31,6 +31,7 @@ class QueryMetadata(BaseModel):
     pattern_extracted: Optional[bool] = Field(None, description="Whether a pattern was extracted")
     pattern_id: Optional[str] = Field(None, description="ID of extracted pattern if any")
     pattern_stored: Optional[bool] = Field(None, description="Whether the pattern was stored in ChromaDB")
+    patterns_retrieved_count: Optional[int] = Field(None, description="Number of patterns retrieved for this query")
 
 
 class QueryResponse(BaseModel):
