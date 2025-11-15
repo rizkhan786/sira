@@ -25,6 +25,9 @@ class QueryMetadata(BaseModel):
     processing_time_seconds: float
     llm_usage: Dict[str, int]
     confidence_score: float
+    quality_score: Optional[float] = Field(None, description="Quality score (0.0-1.0)")
+    quality_level: Optional[str] = Field(None, description="Quality level (poor/acceptable/good/excellent)")
+    quality_breakdown: Optional[Dict[str, Any]] = Field(None, description="Detailed quality breakdown")
 
 
 class QueryResponse(BaseModel):
