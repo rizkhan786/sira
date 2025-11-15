@@ -21,7 +21,9 @@ CREATE TABLE IF NOT EXISTS queries (
     reasoning_steps JSONB NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     processing_time FLOAT NOT NULL,
-    token_usage JSONB NOT NULL
+    token_usage JSONB NOT NULL,
+    quality_score FLOAT,
+    quality_breakdown JSONB
 );
 
 -- Create metrics table

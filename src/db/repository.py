@@ -105,7 +105,9 @@ class DatabaseRepository:
         response_text: str,
         reasoning_steps: List[Dict[str, Any]],
         processing_time: float,
-        token_usage: Dict[str, int]
+        token_usage: Dict[str, int],
+        quality_score: float = None,
+        quality_breakdown: Dict[str, Any] = None
     ) -> str:
         """Save a query and its response.
         
@@ -130,9 +132,10 @@ class DatabaseRepository:
             await conn.execute("""
                 INSERT INTO queries (
                     id, session_id, query_text, response_text,
-                    reasoning_steps, timestamp, processing_time, token_usage
+                    reasoning_steps, timestamp, processing_time, token_usage,
+                    quality_score, quality_breakdown
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             """,
                 query_id,
                 session_id,
@@ -141,7 +144,9 @@ class DatabaseRepository:
                 json.dumps(reasoning_steps),  # Convert to JSON string
                 timestamp,
                 processing_time,
-                json.dumps(token_usage)  # Convert to JSON string
+                json.dumps(token_usage),  # Convert to JSON string
+                quality_score,
+                json.dumps(quality_breakdown) if quality_breakdown else None
             )
         
         logger.info(

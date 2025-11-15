@@ -119,7 +119,9 @@ async def process_query(request: QueryRequest):
             response_text=result["response"],
             reasoning_steps=result["reasoning_steps"],
             processing_time=result["metadata"]["processing_time_seconds"],
-            token_usage=result["metadata"]["llm_usage"]
+            token_usage=result["metadata"]["llm_usage"],
+            quality_score=result["metadata"].get("quality_score"),
+            quality_breakdown=result["metadata"].get("quality_breakdown")
         )
         
         return QueryResponse(**result)

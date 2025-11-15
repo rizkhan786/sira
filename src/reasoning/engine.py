@@ -2,6 +2,7 @@
 from typing import Dict, Any, List
 from datetime import datetime, timezone
 from src.llm.client import get_llm_client
+from src.quality.scorer import QualityScorer
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -12,6 +13,7 @@ class ReasoningEngine:
     
     def __init__(self):
         self.llm_client = get_llm_client()
+        self.quality_scorer = QualityScorer()
         
     async def process_query(
         self,
@@ -44,6 +46,13 @@ class ReasoningEngine:
             end_time = datetime.now(timezone.utc)
             processing_time = (end_time - start_time).total_seconds()
             
+            # Calculate quality score
+            quality_result = await self.quality_scorer.calculate_quality_score(
+                query=query,
+                response=response["text"],
+                reasoning_steps=reasoning_steps
+            )
+            
             result = {
                 "response": response["text"],
                 "reasoning_steps": reasoning_steps,
@@ -52,7 +61,13 @@ class ReasoningEngine:
                     "timestamp": end_time.isoformat(),
                     "processing_time_seconds": processing_time,
                     "llm_usage": response["usage"],
-                    "confidence_score": response.get("confidence", 0.85)
+                    "confidence_score": response.get("confidence", 0.85),
+                    "quality_score": quality_result["quality_score"],
+                    "quality_level": quality_result["quality_level"],
+                    "quality_breakdown": {
+                        "rule_based": quality_result["rule_based"],
+                        "llm_based": quality_result["llm_based"]
+                    }
                 }
             }
             
