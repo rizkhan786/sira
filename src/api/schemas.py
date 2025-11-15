@@ -30,6 +30,7 @@ class QueryMetadata(BaseModel):
     quality_breakdown: Optional[Dict[str, Any]] = Field(None, description="Detailed quality breakdown")
     pattern_extracted: Optional[bool] = Field(None, description="Whether a pattern was extracted")
     pattern_id: Optional[str] = Field(None, description="ID of extracted pattern if any")
+    pattern_stored: Optional[bool] = Field(None, description="Whether the pattern was stored in ChromaDB")
 
 
 class QueryResponse(BaseModel):

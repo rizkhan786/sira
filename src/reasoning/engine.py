@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from src.llm.client import get_llm_client
 from src.quality.scorer import QualityScorer
 from src.patterns.extractor import PatternExtractor
+from src.patterns.storage import PatternStorage
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -19,6 +20,7 @@ class ReasoningEngine:
             llm_service=self.llm_client,
             config={}
         )
+        self.pattern_storage = PatternStorage()
         
     async def process_query(
         self,
@@ -60,6 +62,7 @@ class ReasoningEngine:
             
             # Extract pattern if quality is high enough
             pattern = None
+            pattern_stored = False
             if quality_result["quality_score"] >= self.pattern_extractor.QUALITY_THRESHOLD:
                 pattern = await self.pattern_extractor.extract_pattern(
                     query=query,
@@ -70,6 +73,10 @@ class ReasoningEngine:
                         "llm_based": quality_result["llm_based"]
                     }
                 )
+                
+                # Store pattern in ChromaDB if extraction succeeded
+                if pattern:
+                    pattern_stored = self.pattern_storage.store_pattern(pattern)
             
             result = {
                 "response": response["text"],
@@ -87,7 +94,8 @@ class ReasoningEngine:
                         "llm_based": quality_result["llm_based"]
                     },
                     "pattern_extracted": pattern is not None,
-                    "pattern_id": pattern["pattern_id"] if pattern else None
+                    "pattern_id": pattern["pattern_id"] if pattern else None,
+                    "pattern_stored": pattern_stored
                 },
                 "extracted_pattern": pattern  # Include pattern for storage
             }
