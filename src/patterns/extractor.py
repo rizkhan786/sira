@@ -126,6 +126,15 @@ Respond ONLY with valid JSON, no additional text."""
             # Parse the extracted pattern
             pattern_text = extraction_result['response'].strip()
             
+            logger.info(
+                "llm_response_received",
+                extra={
+                    "response_length": len(pattern_text),
+                    "first_100_chars": pattern_text[:100],
+                    "last_100_chars": pattern_text[-100:] if len(pattern_text) > 100 else pattern_text
+                }
+            )
+            
             # Try to find JSON in the response
             start_idx = pattern_text.find('{')
             end_idx = pattern_text.rfind('}') + 1
@@ -135,7 +144,7 @@ Respond ONLY with valid JSON, no additional text."""
                     "pattern_extraction_invalid",
                     extra={
                         "reason": "no_json_found",
-                        "response_preview": pattern_text[:300]
+                        "response_full": pattern_text
                     }
                 )
                 return None
@@ -146,7 +155,7 @@ Respond ONLY with valid JSON, no additional text."""
                 "parsing_pattern_json",
                 extra={
                     "json_length": len(json_str),
-                    "json_preview": json_str[:200]
+                    "json_str": json_str  # Log full JSON for debugging
                 }
             )
             
