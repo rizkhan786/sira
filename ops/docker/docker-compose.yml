@@ -1,0 +1,92 @@
+services:
+  sira-llm:
+    image: ollama/ollama:latest
+    container_name: sira-llm
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - sira_network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  sira-api:
+    build:
+      context: ../..
+      dockerfile: ops/docker/Dockerfile
+    container_name: sira-api-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../../src:/app/src
+      - sira_data:/data
+    environment:
+      - ENV=development
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=sira
+      - POSTGRES_USER=sira
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - LLM_BASE_URL=http://sira-llm:11434
+      - LLM_MODEL_GENERAL=${LLM_MODEL_GENERAL:-llama3:8b}
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+      sira-llm:
+        condition: service_healthy
+    networks:
+      - sira_network
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sira-postgres
+    environment:
+      - POSTGRES_DB=sira
+      - POSTGRES_USER=sira
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    networks:
+      - sira_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sira"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: sira-chromadb
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    ports:
+      - "8000:8000"
+    networks:
+      - sira_network
+
+networks:
+  sira_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  chromadb_data:
+  ollama_data:
+  sira_data:
