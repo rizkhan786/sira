@@ -50,7 +50,7 @@ class ReasoningEngine:
                 query=query,
                 n_results=3,
                 min_quality=0.7,
-                min_similarity=0.5
+                min_similarity=0.2  # Lowered from 0.5 to 0.2 for better matching
             )
             
             # Add patterns to context
