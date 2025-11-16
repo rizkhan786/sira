@@ -89,17 +89,8 @@ class ReasoningEngine:
                 reasoning_steps=reasoning_steps
             )
             
-            # Record pattern usage (async, needs query_id from context)
-            pattern_usage_ids = []
-            if pattern_metadata and session_id:
-                try:
-                    pattern_usage_ids = await self.usage_tracker.record_pattern_usage(
-                        query_id=session_id,  # Using session_id as query_id for now
-                        patterns=pattern_metadata,
-                        final_quality=quality_result["quality_score"]
-                    )
-                except Exception as e:
-                    logger.error("pattern_usage_tracking_failed", error=str(e))
+            # Pattern usage will be recorded in API layer after query is saved
+            # (Removed inline tracking to avoid foreign key constraint issues)
             
             # Extract pattern if quality is high enough
             pattern = None
@@ -139,7 +130,7 @@ class ReasoningEngine:
                     "pattern_stored": pattern_stored,
                     "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0,
                     "patterns_applied_count": len(pattern_metadata),
-                    "pattern_usage_ids": pattern_usage_ids
+                    "pattern_metadata": pattern_metadata  # For API layer to record usage
                 },
                 "extracted_pattern": pattern  # Include pattern for storage
             }

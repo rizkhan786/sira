@@ -159,7 +159,7 @@ async def process_query(request: QueryRequest):
             context=request.context
         )
         
-        await repository.save_query(
+        query_id = await repository.save_query(
             session_id=session_id,
             query_text=request.query,
             response_text=result["response"],
@@ -169,6 +169,20 @@ async def process_query(request: QueryRequest):
             quality_score=result["metadata"].get("quality_score"),
             quality_breakdown=result["metadata"].get("quality_breakdown")
         )
+        
+        # Record pattern usage now that query is saved
+        if result["metadata"].get("pattern_metadata"):
+            try:
+                from src.patterns.usage_tracker import PatternUsageTracker
+                usage_tracker = PatternUsageTracker()
+                await usage_tracker.record_pattern_usage(
+                    query_id=query_id,
+                    patterns=result["metadata"]["pattern_metadata"],
+                    final_quality=result["metadata"].get("quality_score")
+                )
+                logger.info("pattern_usage_recorded", query_id=query_id)
+            except Exception as e:
+                logger.error("pattern_usage_recording_failed", error=str(e), query_id=query_id)
         
         return QueryResponse(**result)
     except HTTPException:
