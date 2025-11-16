@@ -2,8 +2,9 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import uuid
+import asyncpg
+from src.core.config import get_settings
 from src.core.logging import get_logger
-from src.db.connection import get_db_connection
 
 logger = get_logger(__name__)
 
@@ -12,12 +13,21 @@ class PatternUsageTracker:
     """Tracks when patterns are applied and their effectiveness."""
     
     def __init__(self):
-        self.db_connection = None
+        self.settings = get_settings()
+        self.pool: Optional[asyncpg.Pool] = None
     
     async def initialize(self):
-        """Initialize database connection."""
-        if not self.db_connection:
-            self.db_connection = await get_db_connection()
+        """Initialize database connection pool."""
+        if not self.pool:
+            self.pool = await asyncpg.create_pool(
+                host=self.settings.postgres_host,
+                port=self.settings.postgres_port,
+                user=self.settings.postgres_user,
+                password=self.settings.postgres_password,
+                database=self.settings.postgres_db,
+                min_size=1,
+                max_size=5
+            )
     
     async def record_pattern_usage(
         self,
@@ -61,23 +71,24 @@ class PatternUsageTracker:
                 improved_quality = final_quality > baseline_quality
             
             try:
-                query = """
+                sql = """
                     INSERT INTO pattern_usage (
                         id, query_id, pattern_id, similarity_score,
                         applied_at, effectiveness_score, improved_quality
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7)
                 """
                 
-                await self.db_connection.execute(
-                    query,
-                    usage_id,
-                    query_id,
-                    pattern_id,
-                    similarity_score,
-                    datetime.now(timezone.utc),
-                    effectiveness_score,
-                    improved_quality
-                )
+                async with self.pool.acquire() as conn:
+                    await conn.execute(
+                        sql,
+                        usage_id,
+                        query_id,
+                        pattern_id,
+                        similarity_score,
+                        datetime.now(timezone.utc),
+                        effectiveness_score,
+                        improved_quality
+                    )
                 
                 usage_ids.append(usage_id)
                 
@@ -114,19 +125,20 @@ class PatternUsageTracker:
         await self.initialize()
         
         try:
-            query = """
+            sql = """
                 UPDATE pattern_usage
                 SET effectiveness_score = $1,
                     improved_quality = $2
                 WHERE id = $3
             """
             
-            await self.db_connection.execute(
-                query,
-                effectiveness_score,
-                improved_quality,
-                usage_id
-            )
+            async with self.pool.acquire() as conn:
+                await conn.execute(
+                    sql,
+                    effectiveness_score,
+                    improved_quality,
+                    usage_id
+                )
             
             logger.info(
                 "pattern_effectiveness_updated",
@@ -156,7 +168,7 @@ class PatternUsageTracker:
         await self.initialize()
         
         try:
-            query = """
+            sql = """
                 SELECT 
                     COUNT(*) as usage_count,
                     AVG(similarity_score) as avg_similarity,
@@ -167,7 +179,8 @@ class PatternUsageTracker:
                     AND effectiveness_score IS NOT NULL
             """
             
-            row = await self.db_connection.fetchrow(query, pattern_id)
+            async with self.pool.acquire() as conn:
+                row = await conn.fetchrow(sql, pattern_id)
             
             usage_count = row['usage_count'] if row else 0
             success_count = row['success_count'] if row else 0
@@ -211,7 +224,7 @@ class PatternUsageTracker:
         await self.initialize()
         
         try:
-            query = """
+            sql = """
                 SELECT 
                     id, pattern_id, similarity_score,
                     applied_at, effectiveness_score, improved_quality
@@ -220,7 +233,8 @@ class PatternUsageTracker:
                 ORDER BY similarity_score DESC
             """
             
-            rows = await self.db_connection.fetch(query, query_id)
+            async with self.pool.acquire() as conn:
+                rows = await conn.fetch(sql, query_id)
             
             usage_records = []
             for row in rows:
@@ -244,6 +258,7 @@ class PatternUsageTracker:
             return []
     
     async def close(self):
-        """Close database connection."""
-        if self.db_connection:
-            await self.db_connection.close()
+        """Close database connection pool."""
+        if self.pool:
+            await self.pool.close()
+            self.pool = None
