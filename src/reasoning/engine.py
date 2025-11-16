@@ -6,6 +6,8 @@ from src.quality.scorer import QualityScorer
 from src.patterns.extractor import PatternExtractor
 from src.patterns.storage import PatternStorage
 from src.patterns.retrieval import PatternRetriever
+from src.reasoning.pattern_prompt import PatternPromptFormatter
+from src.patterns.usage_tracker import PatternUsageTracker
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -23,6 +25,8 @@ class ReasoningEngine:
         )
         self.pattern_storage = PatternStorage()
         self.pattern_retriever = PatternRetriever(self.pattern_storage)
+        self.pattern_formatter = PatternPromptFormatter()
+        self.usage_tracker = PatternUsageTracker()
         
     async def process_query(
         self,
@@ -53,12 +57,20 @@ class ReasoningEngine:
                 min_similarity=0.2  # Lowered from 0.5 to 0.2 for better matching
             )
             
-            # Add patterns to context
+            # Format patterns for prompt using new formatter
+            pattern_metadata = []
             if retrieved_patterns:
                 if context is None:
                     context = {}
                 context['retrieved_patterns'] = retrieved_patterns
-                context['pattern_guidance'] = self.pattern_retriever.format_patterns_for_prompt(retrieved_patterns)
+                context['pattern_guidance'] = self.pattern_formatter.format_patterns_for_prompt(retrieved_patterns)
+                pattern_metadata = self.pattern_formatter.extract_pattern_metadata(retrieved_patterns)
+                
+                logger.info(
+                    "patterns_applied",
+                    pattern_count=len(retrieved_patterns),
+                    pattern_ids=self.pattern_formatter.format_pattern_ids_summary(retrieved_patterns)
+                )
             
             # Generate reasoning steps
             reasoning_steps = await self._generate_reasoning_steps(query, context)
@@ -76,6 +88,18 @@ class ReasoningEngine:
                 response=response["text"],
                 reasoning_steps=reasoning_steps
             )
+            
+            # Record pattern usage (async, needs query_id from context)
+            pattern_usage_ids = []
+            if pattern_metadata and session_id:
+                try:
+                    pattern_usage_ids = await self.usage_tracker.record_pattern_usage(
+                        query_id=session_id,  # Using session_id as query_id for now
+                        patterns=pattern_metadata,
+                        final_quality=quality_result["quality_score"]
+                    )
+                except Exception as e:
+                    logger.error("pattern_usage_tracking_failed", error=str(e))
             
             # Extract pattern if quality is high enough
             pattern = None
@@ -113,7 +137,9 @@ class ReasoningEngine:
                     "pattern_extracted": pattern is not None,
                     "pattern_id": pattern["pattern_id"] if pattern else None,
                     "pattern_stored": pattern_stored,
-                    "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0
+                    "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0,
+                    "patterns_applied_count": len(pattern_metadata),
+                    "pattern_usage_ids": pattern_usage_ids
                 },
                 "extracted_pattern": pattern  # Include pattern for storage
             }
