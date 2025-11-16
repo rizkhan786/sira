@@ -130,18 +130,21 @@ class PatternPromptFormatter:
         """Extract minimal metadata for pattern usage tracking.
         
         Args:
-            patterns: Full pattern data
+            patterns: Full pattern data from retrieval (with nested metadata)
             
         Returns:
-            List of pattern metadata dicts
+            List of clean pattern metadata dicts (no datetime objects)
         """
-        metadata = []
+        metadata_list = []
         for pattern in patterns:
-            metadata.append({
+            # Handle nested metadata structure from ChromaDB
+            pattern_meta = pattern.get("metadata", {})
+            
+            metadata_list.append({
                 "pattern_id": pattern.get("pattern_id"),
-                "similarity": pattern.get("similarity", 0.0),
-                "quality_score": pattern.get("quality_score", 0.0),
-                "domain": pattern.get("domain"),
-                "pattern_type": pattern.get("pattern_type")
+                "similarity": float(pattern.get("similarity_score", 0.0)),
+                "quality_score": float(pattern_meta.get("quality_score", 0.0)),
+                "domain": pattern_meta.get("domain"),
+                "pattern_type": pattern_meta.get("pattern_type")
             })
-        return metadata
+        return metadata_list

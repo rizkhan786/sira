@@ -78,6 +78,9 @@ class PatternUsageTracker:
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7)
                 """
                 
+                # Ensure timezone-aware datetime
+                applied_at = datetime.now(timezone.utc)
+                
                 async with self.pool.acquire() as conn:
                     await conn.execute(
                         sql,
@@ -85,7 +88,7 @@ class PatternUsageTracker:
                         query_id,
                         pattern_id,
                         similarity_score,
-                        datetime.now(timezone.utc),
+                        applied_at,
                         effectiveness_score,
                         improved_quality
                     )
