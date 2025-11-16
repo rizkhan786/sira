@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS pattern_usage (
     query_id UUID REFERENCES queries(id) ON DELETE CASCADE,
     pattern_id VARCHAR(100) NOT NULL,
     similarity_score FLOAT NOT NULL,
-    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    applied_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     effectiveness_score FLOAT,
     improved_quality BOOLEAN
 );
