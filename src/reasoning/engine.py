@@ -8,6 +8,7 @@ from src.patterns.storage import PatternStorage
 from src.patterns.retrieval import PatternRetriever
 from src.reasoning.pattern_prompt import PatternPromptFormatter
 from src.patterns.usage_tracker import PatternUsageTracker
+from src.reasoning.refinement import RefinementLoop, RefinementConfig
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -27,6 +28,7 @@ class ReasoningEngine:
         self.pattern_retriever = PatternRetriever(self.pattern_storage)
         self.pattern_formatter = PatternPromptFormatter()
         self.usage_tracker = PatternUsageTracker()
+        self.refinement_loop = RefinementLoop(RefinementConfig())
         
     async def process_query(
         self,
@@ -89,6 +91,42 @@ class ReasoningEngine:
                 reasoning_steps=reasoning_steps
             )
             
+            initial_quality = quality_result["quality_score"]
+            
+            # Iterative refinement if quality below threshold
+            refinement_result = None
+            if self.refinement_loop.should_refine(initial_quality):
+                logger.info(
+                    "starting_refinement",
+                    initial_quality=initial_quality,
+                    threshold=self.refinement_loop.config.quality_threshold
+                )
+                
+                refinement_result = await self.refinement_loop.refine(
+                    query=query,
+                    initial_response=response["text"],
+                    initial_steps=reasoning_steps,
+                    initial_quality=initial_quality,
+                    reasoning_engine=self,
+                    quality_scorer=self.quality_scorer,
+                    context=context
+                )
+                
+                # Use refined response
+                response["text"] = refinement_result.response
+                reasoning_steps = refinement_result.reasoning_steps
+                quality_result["quality_score"] = refinement_result.final_quality
+                
+                # Update quality breakdown with final iteration
+                final_quality = await self.quality_scorer.calculate_quality_score(
+                    query=query,
+                    response=refinement_result.response,
+                    reasoning_steps=refinement_result.reasoning_steps
+                )
+                quality_result["quality_level"] = final_quality["quality_level"]
+                quality_result["rule_based"] = final_quality["rule_based"]
+                quality_result["llm_based"] = final_quality["llm_based"]
+            
             # Pattern usage will be recorded in API layer after query is saved
             # (Removed inline tracking to avoid foreign key constraint issues)
             
@@ -110,28 +148,47 @@ class ReasoningEngine:
                 if pattern:
                     pattern_stored = self.pattern_storage.store_pattern(pattern)
             
+            # Build metadata including refinement info
+            metadata = {
+                "session_id": session_id,
+                "timestamp": end_time.isoformat(),
+                "processing_time_seconds": processing_time,
+                "llm_usage": response["usage"],
+                "confidence_score": response.get("confidence", 0.85),
+                "quality_score": quality_result["quality_score"],
+                "quality_level": quality_result["quality_level"],
+                "quality_breakdown": {
+                    "rule_based": quality_result["rule_based"],
+                    "llm_based": quality_result["llm_based"]
+                },
+                "pattern_extracted": pattern is not None,
+                "pattern_id": pattern["pattern_id"] if pattern else None,
+                "pattern_stored": pattern_stored,
+                "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0,
+                "patterns_applied_count": len(pattern_metadata),
+                "pattern_metadata": pattern_metadata  # For API layer to record usage
+            }
+            
+            # Add refinement metadata if refinement occurred
+            if refinement_result:
+                metadata["refinement"] = {
+                    "performed": True,
+                    "iterations": refinement_result.iterations,
+                    "initial_quality": initial_quality,
+                    "final_quality": refinement_result.final_quality,
+                    "quality_progression": refinement_result.quality_progression,
+                    "convergence_reason": refinement_result.convergence_reason
+                }
+            else:
+                metadata["refinement"] = {
+                    "performed": False,
+                    "reason": "quality_above_threshold" if initial_quality >= self.refinement_loop.config.quality_threshold else "not_applicable"
+                }
+            
             result = {
                 "response": response["text"],
                 "reasoning_steps": reasoning_steps,
-                "metadata": {
-                    "session_id": session_id,
-                    "timestamp": end_time.isoformat(),
-                    "processing_time_seconds": processing_time,
-                    "llm_usage": response["usage"],
-                    "confidence_score": response.get("confidence", 0.85),
-                    "quality_score": quality_result["quality_score"],
-                    "quality_level": quality_result["quality_level"],
-                    "quality_breakdown": {
-                        "rule_based": quality_result["rule_based"],
-                        "llm_based": quality_result["llm_based"]
-                    },
-                    "pattern_extracted": pattern is not None,
-                    "pattern_id": pattern["pattern_id"] if pattern else None,
-                    "pattern_stored": pattern_stored,
-                    "patterns_retrieved_count": len(retrieved_patterns) if retrieved_patterns else 0,
-                    "patterns_applied_count": len(pattern_metadata),
-                    "pattern_metadata": pattern_metadata  # For API layer to record usage
-                },
+                "metadata": metadata,
                 "extracted_pattern": pattern  # Include pattern for storage
             }
             
