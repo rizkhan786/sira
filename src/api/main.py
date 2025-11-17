@@ -14,12 +14,17 @@ from src.api.schemas import (
 from src.reasoning.engine import create_reasoning_engine
 from src.db.repository import get_repository
 from src.llm.client import get_llm_client
+from src.metrics.collector import MetricsCollector
+from src.metrics.storage import MetricsStorage
+from src.api import metrics as metrics_api
 
 logger = get_logger(__name__)
 
 # Global instances
 reasoning_engine = None
 repository = None
+metrics_collector = None
+metrics_storage = None
 
 # Create FastAPI app
 app = FastAPI(
@@ -38,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include metrics router
+app.include_router(metrics_api.router)
 
 
 # Global exception handlers
@@ -86,11 +94,17 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup."""
-    global reasoning_engine, repository
+    global reasoning_engine, repository, metrics_collector, metrics_storage
     logger.info("Starting SIRA API", env=settings.env, port=settings.api_port)
     reasoning_engine = await create_reasoning_engine()
     repository = await get_repository()
     await repository.connect()
+    
+    # Initialize metrics system
+    metrics_storage = MetricsStorage(repository.pool)
+    metrics_collector = MetricsCollector(storage=metrics_storage)
+    metrics_api.set_metrics_storage(metrics_storage)
+    
     logger.info("SIRA API startup complete")
 
 
@@ -183,6 +197,24 @@ async def process_query(request: QueryRequest):
                 logger.info("pattern_usage_recorded", query_id=query_id)
             except Exception as e:
                 logger.error("pattern_usage_recording_failed", error=str(e), query_id=query_id)
+        
+        # Collect metrics
+        if metrics_collector:
+            try:
+                iteration_count = 1
+                if result["metadata"].get("refinement", {}).get("performed"):
+                    iteration_count = result["metadata"]["refinement"]["iterations"]
+                
+                await metrics_collector.collect_query_metrics(
+                    query_id=query_id,
+                    processing_time=result["metadata"]["processing_time_seconds"],
+                    quality_score=result["metadata"]["quality_score"],
+                    iteration_count=iteration_count,
+                    patterns_retrieved=result["metadata"]["patterns_retrieved_count"],
+                    patterns_applied=result["metadata"]["patterns_applied_count"]
+                )
+            except Exception as e:
+                logger.error("metrics_collection_failed", error=str(e), query_id=query_id)
         
         return QueryResponse(**result)
     except HTTPException:
