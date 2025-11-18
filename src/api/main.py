@@ -17,6 +17,8 @@ from src.llm.client import get_llm_client
 from src.metrics.collector import MetricsCollector
 from src.metrics.storage import MetricsStorage
 from src.api import metrics as metrics_api
+from src.matlab.episode_logger import EpisodeLogger
+from src.matlab.config_reader import ConfigReader
 
 logger = get_logger(__name__)
 
@@ -25,6 +27,8 @@ reasoning_engine = None
 repository = None
 metrics_collector = None
 metrics_storage = None
+episode_logger = None
+config_reader = None
 
 # Create FastAPI app
 app = FastAPI(
@@ -94,7 +98,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup."""
-    global reasoning_engine, repository, metrics_collector, metrics_storage
+    global reasoning_engine, repository, metrics_collector, metrics_storage, episode_logger, config_reader
     logger.info("Starting SIRA API", env=settings.env, port=settings.api_port)
     reasoning_engine = await create_reasoning_engine()
     repository = await get_repository()
@@ -104,6 +108,17 @@ async def startup_event():
     metrics_storage = MetricsStorage(repository.pool)
     metrics_collector = MetricsCollector(storage=metrics_storage)
     metrics_api.set_metrics_storage(metrics_storage)
+    
+    # Initialize MATLAB integration
+    episode_logger = EpisodeLogger(
+        log_path="./data/matlab/episodes.mat",
+        batch_size=10,
+        export_interval_seconds=3600
+    )
+    config_reader = ConfigReader(
+        config_path="./data/matlab/optimized_config.json",
+        reload_interval=60
+    )
     
     logger.info("SIRA API startup complete")
 
@@ -215,6 +230,28 @@ async def process_query(request: QueryRequest):
                 )
             except Exception as e:
                 logger.error("metrics_collection_failed", error=str(e), query_id=query_id)
+        
+        # Log episode for MATLAB analysis
+        if episode_logger:
+            try:
+                # Extract quality scores from refinement or single score
+                quality_scores = [result["metadata"]["quality_score"]]
+                if result["metadata"].get("refinement", {}).get("performed"):
+                    quality_scores = result["metadata"]["refinement"]["quality_progression"]
+                
+                episode_logger.log_episode(
+                    query_id=query_id,
+                    session_id=session_id,
+                    query=request.query,
+                    response=result["response"],
+                    reasoning_steps=result["reasoning_steps"],
+                    patterns_retrieved=result["metadata"].get("pattern_metadata", []),
+                    quality_scores=quality_scores,
+                    iteration_count=result["metadata"].get("refinement", {}).get("iterations", 1),
+                    timing_ms={"total": result["metadata"]["processing_time_seconds"] * 1000}
+                )
+            except Exception as e:
+                logger.error("episode_logging_failed", error=str(e), query_id=query_id)
         
         return QueryResponse(**result)
     except HTTPException:
