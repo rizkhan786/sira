@@ -283,18 +283,21 @@ CREATE INDEX idx_metrics_pattern ON metrics(pattern_id);
 
 ---
 
-#### DEL-016: MATLAB Analysis Integration
+#### DEL-016: MATLAB Analysis Integration ✅ COMPLETE
 **Priority:** Must Have  
 **Estimated Effort:** 2 days  
-**Dependencies:** DEL-010 (Metrics Tracking)
+**Actual Effort:** 1 day  
+**Dependencies:** DEL-010 (Metrics Tracking)  
+**Status:** ✅ Complete (2025-11-18)  
+**Commit:** 89996f9
 
 **Description:**
 Enable MATLAB to analyze SIRA's learning behavior through episode logs and optimize configuration parameters.
 
 **Acceptance Criteria:**
-- **AC-045:** Episode logs exported in MATLAB-readable format (.mat files)
-- **AC-046:** Logs contain: query, reasoning steps, patterns used, quality scores, timing
-- **AC-047:** SIRA reads optimized config from MATLAB output files
+- **AC-045:** ✅ Episode logs exported in MATLAB-readable format (.mat files with scipy, JSON fallback)
+- **AC-046:** ✅ Logs contain: query, reasoning steps, patterns used, quality scores, timing, session/query IDs
+- **AC-047:** ✅ SIRA reads optimized config from MATLAB output files (hot-reload every 60s)
 
 **Test Cases:**
 - **TC-045:** Process 10 queries; verify .mat file created with all data
