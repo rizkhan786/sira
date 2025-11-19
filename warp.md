@@ -94,7 +94,16 @@ Rules enforced
 - Work is containerized via Docker Desktop with separate compose files per environment.
 - Secrets in .env files (do not commit real secrets).
 - Acceptance criteria (ACs) must be defined during sprint planning and traced to requirements.
-- Testing is the main quality gate. No deliverable can be marked done until all tests covering its ACs pass.
+- Testing is the main quality gate. No deliverable can be marked done until:
+  * All tests covering its ACs pass
+  * Validation script confirms all required fields from spec are present
+  * API responses validated against acceptance criteria specification
+- Test Validation Protocol (required):
+  * Extract expected fields from sprint scope before testing
+  * Create validation script (tests/validation/validate_del*.py) for each deliverable
+  * Run validation script on all API responses
+  * Document validation results with field-by-field checklist
+  * See docs/testing/test-validation-protocol.md for full process
 - Chrome DevTools MCP integration required for all web application testing and debugging.
 - PROJECT_PLAN.md must be updated after each sprint.
 - Consistency checks (REQ ⇄ DEL ⇄ AC ⇄ TC) are mandatory at both planning and completion gates.
@@ -121,6 +130,7 @@ Definition of Ready (DoR)
 - DEL with linked REQ/NFR
 - ACs authored and linked to each DEL
 - Test cases authored and linked to each AC
+- Validation script created (tests/validation/validate_del*.py) with all expected fields from spec
 - Environment ready (Docker dev/test)
 - Environment images build successfully in Docker Desktop (dev + test)
 - Branch ready (Sprint Execution will create the sprint branch and record it in the sprint doc)
@@ -142,9 +152,15 @@ Steps
    - Update the sprint doc with progress notes.
    - If a design delta arises, create a new ADR under docs/20-Solution/decisions/adr-*.md and note it in sprint-0N.md.
 3) Testing During Execution (gating)
+   - Before testing: Create validation checklist from sprint scope document (extract all expected fields from ACs and implementation details).
+   - Create or use validation script from tests/validation/validate_del*.py to systematically verify all required fields.
    - Execute the Test profile in Docker Desktop and capture results.
-   - Record pass/fail + notes in docs/40-Testing/test-cases.md.
-   - Do not mark any deliverable 'Done' until all tests covering its ACs pass.
+   - Run validation script on API responses to ensure all fields from spec are present.
+   - Record pass/fail + validation results in docs/40-Testing/test-cases.md.
+   - Do not mark any deliverable 'Done' until:
+     * All tests covering its ACs pass
+     * Validation script confirms all required fields present
+     * Response matches spec document field-by-field
 4) Maintain Traceability
    - Ensure DEL ⇄ AC ⇄ TC links remain valid.
    - Update deliverables-register.md, acceptance-criteria-index.md, and test-cases.md as needed.
@@ -158,8 +174,14 @@ How to run: Tell Agent: Do Sprint Completion for Sprint N
 Steps
 1) Acceptance and testing
    - Verify every AC-### is met and all related TC-### pass; record results in test-cases.md.
+   - Run validation scripts (tests/validation/validate_del*.py) for all deliverables to confirm:
+     * All required fields from spec are present in API responses
+     * Field types match expectations
+     * Acceptance criteria compliance validated programmatically
+   - Include validation output in test reports (show checklist of verified fields).
    - Use docs/50-Completion/sprint-completion-checklist.md to confirm all required checks.
    - Run the full test suite in Docker Desktop (Test profile) before merge.
+   - Sprint cannot be marked complete if any validation script fails.
 2) Documentation updates
 - Update docs/30-Planning/sprints/sprint-0N.md with outcomes.
    - Update docs/30-Planning/deliverables-register.md statuses.
