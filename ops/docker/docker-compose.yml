@@ -30,20 +30,20 @@ services:
       - sira_data:/data
     environment:
       - ENV=development
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=sira-postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=sira
       - POSTGRES_USER=sira
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - CHROMADB_HOST=chromadb
+      - CHROMADB_HOST=sira-chromadb
       - CHROMADB_PORT=8000
       - LLM_BASE_URL=http://sira-llm:11434
       - LLM_MODEL_GENERAL=${LLM_MODEL_GENERAL:-llama3:8b}
       - LOG_LEVEL=DEBUG
     depends_on:
-      postgres:
+      sira-postgres:
         condition: service_healthy
-      chromadb:
+      sira-chromadb:
         condition: service_started
       sira-llm:
         condition: service_healthy
@@ -51,7 +51,7 @@ services:
       - sira_network
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
 
-  postgres:
+  sira-postgres:
     image: postgres:16-alpine
     container_name: sira-postgres
     environment:
@@ -71,7 +71,7 @@ services:
       timeout: 5s
       retries: 5
 
-  chromadb:
+  sira-chromadb:
     image: ghcr.io/chroma-core/chroma:latest
     container_name: sira-chromadb
     volumes:
