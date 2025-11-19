@@ -22,7 +22,7 @@ services:
       context: ../..
       dockerfile: ops/docker/Dockerfile
     image: sira-api:latest
-    container_name: sira-api-dev
+    container_name: sira-api
     ports:
       - "8080:8080"
     volumes:
@@ -38,7 +38,7 @@ services:
       - CHROMADB_HOST=sira-chromadb
       - CHROMADB_PORT=8000
       - LLM_BASE_URL=http://sira-llm:11434
-      - LLM_MODEL_GENERAL=${LLM_MODEL_GENERAL:-llama3:8b}
+      - LLM_MODEL_GENERAL=${LLM_MODEL_GENERAL:-llama3.2:3b}
       - LOG_LEVEL=DEBUG
     depends_on:
       sira-postgres:
