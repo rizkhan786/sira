@@ -1,3 +1,5 @@
+name: sira
+
 services:
   sira-llm:
     image: ollama/ollama:latest

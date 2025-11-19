@@ -29,9 +29,13 @@ Once SIRA is running:
 - **Metrics Trends**: http://localhost:8080/metrics/trends?days=7
 - **Complete Metrics**: http://localhost:8080/metrics?days=7
 
-## Container Names
+## Docker Desktop
 
-All SIRA containers are prefixed with `sira-`:
+In Docker Desktop, you'll see:
+- **Project Group:** `sira` (not "docker")
+- **Containers:** All prefixed with `sira-`
+
+### Container Names
 
 - `sira-api-dev` - Main API service (port 8080)
 - `sira-postgres` - PostgreSQL database (port 5433)
