@@ -19,6 +19,7 @@ services:
     build:
       context: ../..
       dockerfile: ops/docker/Dockerfile
+    image: sira-api:latest
     container_name: sira-api-dev
     ports:
       - "8080:8080"
