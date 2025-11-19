@@ -25,9 +25,127 @@ This playbook defines the minimum process to plan, execute, and complete sprints
 - Do Phase Planning
 - Do Sprint Planning
 - Do Sprint Execution
+- Test Deliverable
 - Do Sprint Completion
 - Do Phase Completion
 - Debug Issue
+
+Macro: Test Deliverable
+Objective: Systematically test a single deliverable with validation against spec to ensure completeness before marking as Done.
+
+How to run: Tell Agent: Test Deliverable DEL-XXX
+
+Steps
+1) Pre-Test Preparation (required)
+   - Read the sprint scope document (docs/30-Planning/sprints/sprint-0N-scope.md)
+   - Locate DEL-XXX section with:
+     * Acceptance Criteria (AC-###)
+     * Implementation Details
+     * Expected response fields
+     * Test Cases (TC-###)
+   - Extract ALL expected fields from the spec into a checklist
+   - Example fields to extract:
+     * API response fields (from "Response Schema" or "API Response Example")
+     * Metadata fields (from "Implementation Details" or "Core Metrics")
+     * Status indicators (from "Acceptance Criteria")
+
+2) Create Validation Script (required if not exists)
+   - File: tests/validation/validate_delXXX.py
+   - Include header with spec location (file + line numbers)
+   - Define REQUIRED_FIELDS dict with all fields from spec
+   - Implement validate_response() function
+   - Implement validate_acceptance_criteria() function
+   - Use template from tests/validation/validate_del007.py
+   - Commit validation script before running tests
+
+3) Execute Test Cases (required)
+   - Ensure Docker containers running (docker ps)
+   - For each TC-### linked to DEL-XXX:
+     * Execute test via browser (http://localhost:8080/docs) or API client
+     * Capture full JSON response
+     * Save response to file: tests/responses/del-XXX-tc-YYY.json
+   - Record test execution in docs/40-Testing/test-cases.md
+
+4) Run Validation Script (required - GATE)
+   - For each captured response:
+     python tests/validation/validate_delXXX.py tests/responses/del-XXX-tc-YYY.json
+   - Validation script must output:
+     * ✅ PASSED or ❌ FAILED
+     * List of all required fields with ✅ or ❌
+     * Any missing fields highlighted
+   - If ANY validation fails:
+     * ❌ STOP - Do not proceed
+     * Fix the missing field in code
+     * Restart containers
+     * Re-run tests from step 3
+
+5) Verify Acceptance Criteria (required)
+   - For each AC-### linked to DEL-XXX:
+     * Check AC is met in test results
+     * Confirm validation script passed for related TC
+     * Mark AC as ✅ in docs/40-Testing/acceptance-criteria-index.md
+   - ALL ACs must be ✅ before marking deliverable Done
+
+6) Document Test Results (required)
+   - Update docs/40-Testing/test-cases.md:
+     * Test execution timestamp
+     * Pass/Fail status for each TC
+     * Validation script output summary
+     * Link to captured response files
+   - Create test report: docs/testing/del-XXX-test-report.md
+     * List all ACs and their status
+     * Validation checklist (field-by-field)
+     * Full API responses (or links to response files)
+     * Issues found and resolved
+     * Final status: ✅ All Tests Pass + Validation Pass
+
+7) Mark Deliverable Complete (required - GATE)
+   - Update docs/30-Planning/deliverables-register.md:
+     * Status: Complete
+     * Completion date
+     * Link to test report
+   - Commit all test artifacts:
+     * Validation script
+     * Response files
+     * Test report
+     * Updated test-cases.md
+   - Git commit message: "Complete DEL-XXX: [description] - all tests and validation pass"
+
+Gates (Cannot proceed if not met)
+- Gate 1 (Step 2): Validation script must exist before testing
+- Gate 2 (Step 4): Validation script must pass for all responses
+- Gate 3 (Step 5): All ACs must be verified as met
+- Gate 4 (Step 7): Cannot mark Done until Gates 1-3 pass
+
+Acceptance Criteria for Test Deliverable Protocol
+- ✅ Validation script exists and committed
+- ✅ All expected fields from spec extracted into checklist
+- ✅ All test cases executed and responses captured
+- ✅ Validation script passes for all responses
+- ✅ All acceptance criteria verified and marked complete
+- ✅ Test report documents field-by-field validation
+- ✅ All test artifacts committed to repository
+
+Example Usage
+```
+User: Test Deliverable DEL-007
+
+Agent:
+1. Reading sprint-03-scope.md for DEL-007 Pattern Application Logic...
+2. Extracting expected fields:
+   - patterns_retrieved_count
+   - patterns_applied_count
+   - pattern_extracted
+   - pattern_id
+   - pattern_stored
+3. Validation script exists: tests/validation/validate_del007.py ✅
+4. Executing test cases TC-019, TC-020, TC-021...
+5. Running validation on responses...
+   - TC-019: ✅ All fields present
+   - TC-020: ❌ FAILED - missing patterns_applied_count
+6. GATE FAILED - Cannot mark complete until validation passes
+7. Fix required: Add patterns_applied_count to schema
+```
 
 Macro: Debug Issue
 Objective: Systematically diagnose, fix, and verify resolution of defects or unexpected behavior in containerized environments.
