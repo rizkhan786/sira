@@ -1,0 +1,17 @@
+{
+  "domain": "general",
+  "description": "General knowledge covering various topics",
+  "question_count": 50,
+  "questions": [
+    {"id": "gen_001", "question": "How many continents are there?", "expected_answer": "7", "difficulty": "easy", "category": "geography"},
+    {"id": "gen_002", "question": "What is the largest mammal on Earth?", "expected_answer": "Blue whale", "difficulty": "easy", "category": "nature"},
+    {"id": "gen_003", "question": "How many colors are in a rainbow?", "expected_answer": "7", "difficulty": "easy", "category": "science"},
+    {"id": "gen_004", "question": "What is the capital of the United States?", "expected_answer": "Washington D.C.", "difficulty": "easy", "category": "geography"},
+    {"id": "gen_005", "question": "How many players are on a soccer team?", "expected_answer": "11", "difficulty": "easy", "category": "sports"},
+    {"id": "gen_006", "question": "What is the fastest land animal?", "expected_answer": "Cheetah", "difficulty": "easy", "category": "nature"},
+    {"id": "gen_007", "question": "How many sides does a hexagon have?", "expected_answer": "6", "difficulty": "easy", "category": "math"},
+    {"id": "gen_008", "question": "What is the largest ocean?", "expected_answer": "Pacific Ocean", "difficulty": "easy", "category": "geography"},
+    {"id": "gen_009", "question": "How many days are in a leap year?", "expected_answer": "366", "difficulty": "easy", "category": "general"},
+    {"id": "gen_010", "question": "What is the smallest prime number?", "expected_answer": "2", "difficulty": "medium", "category": "math"}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "domain": "history",
+  "description": "World history, events, figures, and civilizations",
+  "question_count": 50,
+  "questions": [
+    {"id": "hist_001", "question": "In what year did World War II end?", "expected_answer": "1945", "difficulty": "easy", "category": "wars"},
+    {"id": "hist_002", "question": "Who was the first President of the United States?", "expected_answer": "George Washington", "difficulty": "easy", "category": "leaders"},
+    {"id": "hist_003", "question": "What year did the Titanic sink?", "expected_answer": "1912", "difficulty": "medium", "category": "events"},
+    {"id": "hist_004", "question": "Who painted the Mona Lisa?", "expected_answer": "Leonardo da Vinci", "difficulty": "easy", "category": "art"},
+    {"id": "hist_005", "question": "What ancient wonder is still standing today?", "expected_answer": "The Great Pyramid of Giza", "difficulty": "medium", "category": "ancient"},
+    {"id": "hist_006", "question": "In what year did the Berlin Wall fall?", "expected_answer": "1989", "difficulty": "medium", "category": "events"},
+    {"id": "hist_007", "question": "Who was the first man on the moon?", "expected_answer": "Neil Armstrong", "difficulty": "easy", "category": "science"},
+    {"id": "hist_008", "question": "What year did World War I begin?", "expected_answer": "1914", "difficulty": "medium", "category": "wars"},
+    {"id": "hist_009", "question": "Who was known as the 'Maid of Orleans'?", "expected_answer": "Joan of Arc", "difficulty": "medium", "category": "leaders"},
+    {"id": "hist_010", "question": "What year did Columbus reach the Americas?", "expected_answer": "1492", "difficulty": "easy", "category": "exploration"}
+  ]
+}

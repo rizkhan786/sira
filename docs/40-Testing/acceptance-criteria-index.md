@@ -1,7 +1,7 @@
 # Acceptance Criteria Index - SIRA
 
-**Last Updated:** 2025-11-15  
-**Phase:** 1 (Foundation)
+**Last Updated:** 2025-11-26  
+**Phase:** 2 (Enhancement)
 
 ## Format
 - **ID:** AC-### (unique identifier)
@@ -538,15 +538,173 @@
 
 ---
 
+## DEL-030: MATLAB Advanced Analytics Dashboard
+
+### AC-070
+**Deliverable:** DEL-030  
+**Requirement:** REQ-016  
+**Description:** Dashboard successfully loads episodes.mat file and computes learning velocity (quality improvement rate over time).  
+**Verification:** Run dashboard with sample episodes file, verify velocity calculation
+
+### AC-071
+**Deliverable:** DEL-030  
+**Requirement:** REQ-016  
+**Description:** Pattern effectiveness heatmap generated showing quality improvement by domain and pattern type.  
+**Verification:** Visual inspection of generated heatmap figure
+
+### AC-072
+**Deliverable:** DEL-030  
+**Requirement:** REQ-016  
+**Description:** PDF report auto-generated with visualizations, metrics, insights, and recommendations.  
+**Verification:** Verify PDF created in /data/matlab/reports/ with all sections
+
+---
+
+## DEL-032: MATLAB Pattern Optimization Engine
+
+### AC-073
+**Deliverable:** DEL-032  
+**Requirement:** REQ-005  
+**Description:** Pattern clustering identifies and groups similar patterns (cosine similarity > 0.9).  
+**Verification:** Test with 100 patterns containing duplicates, verify clustering
+
+### AC-074
+**Deliverable:** DEL-032  
+**Requirement:** REQ-005  
+**Description:** Pattern distillation reduces library size by 20%+ without quality loss (< 2% degradation).  
+**Verification:** Compare quality scores before/after distillation
+
+### AC-075
+**Deliverable:** DEL-032  
+**Requirement:** REQ-005  
+**Description:** Gap analysis identifies underserved domains (< 5 patterns) and recommends priority areas.  
+**Verification:** Run analysis, verify low-coverage domains flagged
+
+---
+
+## DEL-034: SIRA Core Metrics System
+
+### AC-076
+**Deliverable:** DEL-034  
+**Requirement:** REQ-010, NFR-013  
+**Description:** All Tier 1 metrics (learning_velocity, pattern_utilization_rate, avg_quality, domain_coverage) computed for every query.  
+**Verification:** Submit query, verify all 4 Tier 1 metrics in database
+
+### AC-077
+**Deliverable:** DEL-034  
+**Requirement:** REQ-010  
+**Description:** Metrics persisted to database with timestamps and linked to query_id/session_id.  
+**Verification:** Database query shows metrics with correct relationships
+
+### AC-078
+**Deliverable:** DEL-034  
+**Requirement:** REQ-010  
+**Description:** API endpoint GET /metrics/core returns all 10 SIRA-specific metrics in JSON format.  
+**Verification:** Call endpoint, validate response schema includes all 10 metrics
+
+---
+
+## DEL-035: SIRA Evaluation Framework
+
+### AC-079
+**Deliverable:** DEL-035  
+**Requirement:** NFR-009  
+**Description:** Test suites cover 8+ domains with 50+ questions each (500+ total): math, geography, science, coding, reasoning, history, language, general.  
+**Verification:** Count test questions in test_suites/*.json files
+
+### AC-080
+**Deliverable:** DEL-035  
+**Requirement:** NFR-009  
+**Description:** Baseline comparator runs same query through base LLM and SIRA, computes statistical significance of improvement (t-test, p < 0.05).  
+**Verification:** Run A/B test on 100 questions, verify statistical analysis
+
+### AC-081
+**Deliverable:** DEL-035  
+**Requirement:** REQ-010  
+**Description:** Learning trajectory analyzer tracks quality improvement over 1000+ queries and generates trend line with R² > 0.7.  
+**Verification:** Run 1000 synthetic queries, verify learning curve generated
+
+---
+
+## DEL-012: Web Interface (MVP)
+
+### AC-082
+**Deliverable:** DEL-012  
+**Requirement:** REQ-012  
+**Description:** Web interface loads at http://localhost:3000, displays query submission form.  
+**Verification:** Browser test, verify page loads without errors
+
+### AC-083
+**Deliverable:** DEL-012  
+**Requirement:** REQ-012  
+**Description:** Reasoning trace rendered as expandable steps with step numbers, descriptions, and quality scores.  
+**Verification:** Submit query, verify trace visualization
+
+### AC-084
+**Deliverable:** DEL-012  
+**Requirement:** REQ-010  
+**Description:** Metrics dashboard displays real-time summary stats (total_queries, avg_quality, avg_latency) from /metrics/summary.  
+**Verification:** Verify dashboard fetches and displays metrics
+
+---
+
+## DEL-021: Performance Optimization
+
+### AC-085
+**Deliverable:** DEL-021  
+**Requirement:** NFR-001  
+**Description:** Query latency reduced by 30%+ vs baseline (Sprint 3 average: 25s, target: <17.5s).  
+**Verification:** Performance test before/after optimization
+
+### AC-086
+**Deliverable:** DEL-021  
+**Requirement:** NFR-002  
+**Description:** System handles 10 concurrent queries without blocking, response times remain consistent.  
+**Verification:** Load test with 10 concurrent users
+
+### AC-087
+**Deliverable:** DEL-021  
+**Requirement:** NFR-002  
+**Description:** Redis cache hit rate > 60% for pattern retrieval queries.  
+**Verification:** Monitor cache metrics after 100 queries
+
+---
+
+## DEL-024: Scalability Testing
+
+### AC-088
+**Deliverable:** DEL-024  
+**Requirement:** NFR-003  
+**Description:** System handles 100K patterns in ChromaDB with pattern retrieval < 1s per query.  
+**Verification:** Load 100K patterns, measure retrieval time
+
+### AC-089
+**Deliverable:** DEL-024  
+**Requirement:** NFR-003  
+**Description:** 50 concurrent users can submit queries successfully with < 5% error rate.  
+**Verification:** Load test with locust, 50 concurrent users
+
+### AC-090
+**Deliverable:** DEL-024  
+**Requirement:** NFR-009  
+**Description:** Performance report documents bottlenecks, latency percentiles (p50, p95, p99), and resource utilization.  
+**Verification:** Verify report generated with all required metrics
+
+---
+
 ## Summary
 
-**Total Acceptance Criteria:** 68  
-**By Deliverable:** Average 2.8 ACs per deliverable  
+**Total Acceptance Criteria:** 90  
+**By Deliverable:** Average 3.0 ACs per deliverable  
 **By Sprint:**
-- Sprint 1: 33 ACs (DEL-001,002,009,011,013,014,015,017,018,019,020)
+- Sprint 1: 33 ACs (DEL-001,002,009,011,013,014,015,017,018,019,020,025)
 - Sprint 2: 18 ACs (DEL-003,004,005,006,022,023)
 - Sprint 3: 12 ACs (DEL-007,008,010,016)
-- Sprint 4+: 5 ACs (DEL-012,021,024)
+- Sprint 4: 21 ACs (DEL-012,021,024,030,032,034,035) - NEW
+
+**Sprint 4 Breakdown:**
+- Must Have: 9 ACs (DEL-021: 3, DEL-034: 3, DEL-035: 3)
+- Should Have: 12 ACs (DEL-012: 3, DEL-024: 3, DEL-030: 3, DEL-032: 3)
 
 **Verification Methods:**
 - Integration Tests: 40 ACs

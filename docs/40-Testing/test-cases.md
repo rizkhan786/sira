@@ -1,8 +1,8 @@
 # Test Cases - SIRA
 
-**Last Updated:** 2025-11-15  
-**Phase:** 1 (Foundation)  
-**Total Test Cases:** 71 (1 per AC)
+**Last Updated:** 2025-11-26  
+**Phase:** 2 (Enhancement)  
+**Total Test Cases:** 90 (1 per AC)
 
 ## Format
 - **ID:** TC-### (maps 1:1 to AC-###)
@@ -430,3 +430,324 @@
 **Traceability:** REQ → DEL → AC → TC (complete chain)
 
 Example: REQ-001 → DEL-001 → AC-001, AC-002, AC-003 → TC-001, TC-002, TC-003
+## Sprint 4 Test Cases (TC-070 through TC-090) - NEW
+
+### TC-070: MATLAB Dashboard Loads Episodes
+**AC:** AC-070 | **Type:** Integration  
+**Steps:**  
+1. Run 20 queries to generate episodes.mat file
+2. Execute matlab/sira_dashboard.m from MATLAB command window
+3. Verify learning velocity calculation completes
+4. Check console output for velocity metrics
+
+**Expected:** Dashboard loads episodes successfully, computes learning velocity (quality improvement rate)  
+**Status:** Not Run
+
+---
+
+### TC-071: Pattern Effectiveness Heatmap
+**AC:** AC-071 | **Type:** Integration  
+**Steps:**  
+1. Load episodes with varied domains and patterns
+2. Run dashboard to generate heatmap
+3. Visual inspection of figure: domains on Y-axis, pattern types on X-axis
+4. Verify colormap shows effectiveness scores
+
+**Expected:** Heatmap figure generated showing quality improvement by domain/pattern  
+**Status:** Not Run
+
+---
+
+### TC-072: PDF Report Generation
+**AC:** AC-072 | **Type:** Integration  
+**Steps:**  
+1. Run full dashboard analysis
+2. Verify PDF created in /data/matlab/reports/sira_report_YYYYMMDD.pdf
+3. Open PDF and verify sections: summary, visualizations, insights, recommendations
+4. Check all figures embedded correctly
+
+**Expected:** PDF report auto-generated with all required sections and visualizations  
+**Status:** Not Run
+
+---
+
+### TC-073: Pattern Clustering
+**AC:** AC-073 | **Type:** Integration  
+**Steps:**  
+1. Create 100 test patterns with 10 near-duplicates (cosine similarity > 0.9)
+2. Run matlab/optimization/cluster_patterns.m
+3. Verify clustering output identifies similar groups
+4. Check cluster sizes and similarity scores
+
+**Expected:** Clustering identifies and groups similar patterns correctly  
+**Status:** Not Run
+
+---
+
+### TC-074: Pattern Distillation
+**AC:** AC-074 | **Type:** Integration  
+**Steps:**  
+1. Establish baseline quality with 100 patterns
+2. Run matlab/optimization/distill_library.m with merge_threshold=0.9
+3. Verify library size reduced by 20%+
+4. Re-run test queries, compare quality scores (< 2% degradation acceptable)
+
+**Expected:** Library compressed by 20%+ with quality maintained within 2%  
+**Status:** Not Run
+
+---
+
+### TC-075: Gap Analysis
+**AC:** AC-075 | **Type:** Integration  
+**Steps:**  
+1. Load pattern library with uneven domain coverage (e.g., 50 math, 2 geography)
+2. Run matlab/optimization/gap_analysis.m
+3. Verify output identifies low-coverage domains (< 5 patterns)
+4. Check recommendation list prioritizes underserved domains
+
+**Expected:** Gap analysis flags underserved domains and recommends priorities  
+**Status:** Not Run
+
+---
+
+### TC-076: Tier 1 Metrics Computed
+**AC:** AC-076 | **Type:** Integration  
+**Steps:**  
+1. Submit test query via API
+2. Query database: SELECT * FROM core_metrics WHERE query_id = '<id>'
+3. Verify all 4 Tier 1 metrics present: learning_velocity, pattern_utilization_rate, avg_quality, domain_coverage
+4. Check metric values are valid (not null, within expected ranges)
+
+**Expected:** All 4 Tier 1 metrics computed and stored for every query  
+**Status:** Not Run
+
+---
+
+### TC-077: Metrics Persistence
+**AC:** AC-077 | **Type:** Integration  
+**Steps:**  
+1. Submit query and capture query_id
+2. Query database: SELECT * FROM core_metrics WHERE query_id = '<id>'
+3. Verify timestamp, query_id, session_id foreign keys correct
+4. Check metric_name and metric_value columns populated
+
+**Expected:** Metrics persisted with correct timestamps and relationships  
+**Status:** Not Run
+
+---
+
+### TC-078: Core Metrics API Endpoint
+**AC:** AC-078 | **Type:** Integration  
+**Steps:**  
+1. Submit 10 queries to populate metrics
+2. Call GET /metrics/core
+3. Parse JSON response
+4. Verify all 10 SIRA metrics present: 4 Tier 1, 3 Tier 2, 3 Tier 3
+5. Validate response schema matches documentation
+
+**Expected:** API returns all 10 SIRA-specific metrics in correct JSON format  
+**Status:** Not Run
+
+---
+
+### TC-079: Test Suite Coverage
+**AC:** AC-079 | **Type:** Inspection  
+**Steps:**  
+1. Count test questions in 	ests/evaluation/test_suites/*.json
+2. Verify 8 domains: math, geography, science, coding, reasoning, history, language, general
+3. Count questions per domain (min 50 each)
+4. Total count should be 500+
+
+**Expected:** Test suites cover 8+ domains with 50+ questions each (500+ total)  
+**Status:** Not Run
+
+---
+
+### TC-080: Baseline Comparison Statistical Significance
+**AC:** AC-080 | **Type:** Integration  
+**Steps:**  
+1. Select 100 test questions from suite
+2. Run src/evaluation/baseline_comparator.py with base LLM and SIRA
+3. Capture quality scores for both systems
+4. Verify statistical analysis (t-test) performed
+5. Check p-value < 0.05 for significance
+
+**Expected:** A/B test shows statistically significant improvement (p < 0.05)  
+**Status:** Not Run
+
+---
+
+### TC-081: Learning Trajectory Analysis
+**AC:** AC-081 | **Type:** Integration  
+**Steps:**  
+1. Run src/evaluation/trajectory_analyzer.py with 1000 synthetic queries
+2. Plot quality scores over time
+3. Fit linear regression to trend
+4. Verify R� > 0.7 (strong learning trend)
+5. Check trajectory report generated
+
+**Expected:** Learning curve generated with R� > 0.7 showing improvement over 1000 queries  
+**Status:** Not Run
+
+---
+
+### TC-082: Web Interface Loads
+**AC:** AC-082 | **Type:** E2E  
+**Steps:**  
+1. Start all containers including frontend
+2. Navigate to http://localhost:3000 in browser
+3. Verify page loads without console errors
+4. Check query form visible with text input and submit button
+
+**Expected:** Web interface loads successfully and displays query form  
+**Status:** Not Run
+
+---
+
+### TC-083: Reasoning Trace Visualization
+**AC:** AC-083 | **Type:** E2E  
+**Steps:**  
+1. Submit query \"What is 2+2?\" via web UI
+2. Wait for response to render
+3. Verify reasoning trace displayed as expandable steps
+4. Check each step shows: step number, description, quality score
+5. Test expand/collapse functionality
+
+**Expected:** Reasoning trace rendered with expandable steps and complete information  
+**Status:** Not Run
+
+---
+
+### TC-084: Metrics Dashboard Display
+**AC:** AC-084 | **Type:** E2E  
+**Steps:**  
+1. Navigate to metrics dashboard page
+2. Verify dashboard fetches from /metrics/summary
+3. Check display shows: total_queries, avg_quality, avg_latency_ms
+4. Submit query, verify metrics update (may require refresh)
+
+**Expected:** Dashboard displays real-time metrics from API  
+**Status:** Not Run
+
+---
+
+### TC-085: Query Latency Reduction
+**AC:** AC-085 | **Type:** Performance  
+**Steps:**  
+1. Measure baseline: Run 20 queries, record average latency (Sprint 3 baseline: ~25s)
+2. Implement performance optimizations (caching, async)
+3. Run same 20 queries again
+4. Calculate improvement: (baseline - optimized) / baseline * 100%
+5. Verify improvement >= 30%
+
+**Expected:** Query latency reduced by 30%+ (target: <17.5s average)  
+**Status:** Not Run
+
+---
+
+### TC-086: Concurrent Query Handling
+**AC:** AC-086 | **Type:** Performance  
+**Steps:**  
+1. Use load testing tool (locust or pytest-asyncio)
+2. Submit 10 concurrent queries
+3. Measure response times for all queries
+4. Verify no requests block/timeout
+5. Check response time variance < 20%
+
+**Expected:** System handles 10 concurrent queries with consistent response times  
+**Status:** Not Run
+
+---
+
+### TC-087: Redis Cache Hit Rate
+**AC:** AC-087 | **Type:** Performance  
+**Steps:**  
+1. Configure Redis cache for pattern retrieval
+2. Submit 100 queries (mix of similar and unique)
+3. Monitor Redis metrics using INFO command
+4. Calculate hit rate: cache_hits / (cache_hits + cache_misses)
+5. Verify hit rate > 60%
+
+**Expected:** Cache hit rate exceeds 60% after 100 queries  
+**Status:** Not Run
+
+---
+
+### TC-088: 100K Pattern Scalability
+**AC:** AC-088 | **Type:** Performance  
+**Steps:**  
+1. Generate 100K synthetic patterns using 	ests/load/generate_patterns.py
+2. Load patterns into ChromaDB
+3. Submit 20 test queries
+4. Measure pattern retrieval time for each query
+5. Verify average retrieval time < 1s
+
+**Expected:** Pattern retrieval remains under 1 second with 100K patterns  
+**Status:** Not Run
+
+---
+
+### TC-089: 50 Concurrent Users Load Test
+**AC:** AC-089 | **Type:** Performance  
+**Steps:**  
+1. Configure locust with 50 concurrent users
+2. Run load test for 5 minutes: locust -f tests/load/locustfile.py --users 50
+3. Monitor response times, error rates, throughput
+4. Verify error rate < 5%
+5. Check all users can submit queries successfully
+
+**Expected:** System handles 50 concurrent users with < 5% error rate  
+**Status:** Not Run
+
+---
+
+### TC-090: Performance Report Generation
+**AC:** AC-090 | **Type:** Integration  
+**Steps:**  
+1. Run full scalability test suite (TC-088, TC-089)
+2. Execute report generator script
+3. Verify report includes:
+   - Latency percentiles (p50, p95, p99)
+   - Throughput metrics (queries/sec)
+   - Error rates
+   - Resource utilization (CPU, memory)
+   - Identified bottlenecks
+4. Check report format (markdown or PDF)
+
+**Expected:** Comprehensive performance report generated with all required metrics  
+**Status:** Not Run
+
+---
+
+## Sprint 4 Test Summary
+
+**Total Sprint 4 Test Cases:** 21 (TC-070 through TC-090)
+
+**By Deliverable:**
+- DEL-030 (MATLAB Dashboard): TC-070, TC-071, TC-072 (3 TCs)
+- DEL-032 (Pattern Optimization): TC-073, TC-074, TC-075 (3 TCs)
+- DEL-034 (Core Metrics): TC-076, TC-077, TC-078 (3 TCs)
+- DEL-035 (Evaluation Framework): TC-079, TC-080, TC-081 (3 TCs)
+- DEL-012 (Web Interface): TC-082, TC-083, TC-084 (3 TCs)
+- DEL-021 (Performance): TC-085, TC-086, TC-087 (3 TCs)
+- DEL-024 (Scalability): TC-088, TC-089, TC-090 (3 TCs)
+
+**Test Types:**
+- Integration: 15 TCs
+- Performance: 5 TCs
+- E2E: 3 TCs
+- Inspection: 1 TC
+
+---
+
+## Updated Summary by Sprint
+
+| Sprint | Test Case IDs | Count | Focus Areas |
+|--------|---------------|-------|-------------|
+| Sprint 1 | TC-001-033, TC-067-069 | 36 TCs | Infrastructure, API, LLM, Config |
+| Sprint 2 | TC-007-012, TC-034-051, TC-063-066 | 24 TCs | Quality, Patterns, Code Quality, Reliability |
+| Sprint 3 | TC-019-030 | 12 TCs | Pattern Application, Refinement, Metrics, MATLAB |
+| Sprint 4 | TC-070-090 | 21 TCs | Analytics, Optimization, Evaluation, Performance |
+
+**Total:** 90 Test Cases  
+**Status:** Sprint 1-3 complete, Sprint 4 \"Not Run\"

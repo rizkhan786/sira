@@ -1,0 +1,17 @@
+{
+  "domain": "language",
+  "description": "Grammar, vocabulary, idioms, and language comprehension",
+  "question_count": 50,
+  "questions": [
+    {"id": "lang_001", "question": "What is a synonym for 'happy'?", "expected_answer": "Joyful, glad, pleased", "difficulty": "easy", "category": "vocabulary"},
+    {"id": "lang_002", "question": "What is the past tense of 'run'?", "expected_answer": "Ran", "difficulty": "easy", "category": "grammar"},
+    {"id": "lang_003", "question": "What does the idiom 'break the ice' mean?", "expected_answer": "To initiate conversation in a social setting", "difficulty": "medium", "category": "idioms"},
+    {"id": "lang_004", "question": "What is an antonym for 'dark'?", "expected_answer": "Light, bright", "difficulty": "easy", "category": "vocabulary"},
+    {"id": "lang_005", "question": "What is the plural of 'mouse'?", "expected_answer": "Mice", "difficulty": "medium", "category": "grammar"},
+    {"id": "lang_006", "question": "What does 'a piece of cake' mean as an idiom?", "expected_answer": "Something very easy", "difficulty": "easy", "category": "idioms"},
+    {"id": "lang_007", "question": "What part of speech is the word 'quickly'?", "expected_answer": "Adverb", "difficulty": "medium", "category": "grammar"},
+    {"id": "lang_008", "question": "What is a homophone for 'write'?", "expected_answer": "Right, rite", "difficulty": "medium", "category": "vocabulary"},
+    {"id": "lang_009", "question": "What does 'beat around the bush' mean?", "expected_answer": "To avoid talking directly about something", "difficulty": "medium", "category": "idioms"},
+    {"id": "lang_010", "question": "What is the superlative form of 'good'?", "expected_answer": "Best", "difficulty": "easy", "category": "grammar"}
+  ]
+}
