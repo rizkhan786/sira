@@ -1,5 +1,5 @@
 """Metrics API endpoints for SIRA."""
-from typing import Optional
+from typing import Optional, Dict, List, Any
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -43,6 +43,8 @@ class PatternMetricsResponse(BaseModel):
 
 # Global metrics storage instance (set in main.py)
 _metrics_storage = None
+_core_metrics = None
+_advanced_metrics = None
 
 
 def set_metrics_storage(storage):
@@ -54,6 +56,19 @@ def set_metrics_storage(storage):
     global _metrics_storage
     _metrics_storage = storage
     logger.info("metrics_storage_set_for_api")
+
+
+def set_core_metrics(core_metrics, advanced_metrics):
+    """Set the global core and advanced metrics instances.
+    
+    Args:
+        core_metrics: CoreMetrics instance
+        advanced_metrics: AdvancedMetrics instance
+    """
+    global _core_metrics, _advanced_metrics
+    _core_metrics = core_metrics
+    _advanced_metrics = advanced_metrics
+    logger.info("core_advanced_metrics_set_for_api")
 
 
 @router.get("/summary", response_model=MetricsSummary)
@@ -151,3 +166,52 @@ async def get_pattern_metrics(pattern_id: str):
     except Exception as e:
         logger.error("get_pattern_metrics_failed", error=str(e), pattern_id=pattern_id)
         raise HTTPException(status_code=500, detail=f"Failed to get pattern metrics: {str(e)}")
+
+@router.get("/core", response_model=Dict[str, Any])
+async def get_core_metrics(
+    tier: Optional[str] = Query("all", description="Tier to fetch: tier1, tier2, tier3, or all"),
+    lookback_hours: int = Query(24, ge=1, le=720, description="Hours to look back for Tier 1"),
+    lookback_days: int = Query(7, ge=1, le=90, description="Days to look back for Tier 2/3")
+):
+    """Get SIRA core metrics (10 SIRA-specific metrics across 3 tiers).
+    
+    Args:
+        tier: Which tier to fetch (tier1, tier2, tier3, or all)
+        lookback_hours: Hours for Tier 1 time-based metrics
+        lookback_days: Days for Tier 2/3 time-based metrics
+        
+    Returns:
+        Dictionary with requested tier metrics
+    """
+    if not _core_metrics or not _advanced_metrics:
+        raise HTTPException(
+            status_code=503,
+            detail="Core metrics not available. Initialize metrics system."
+        )
+    
+    try:
+        result = {}
+        
+        if tier in ["tier1", "all"]:
+            tier1 = await _core_metrics.compute_all_tier1_metrics(lookback_hours)
+            result["tier1"] = tier1
+        
+        if tier in ["tier2", "all"]:
+            tier2 = await _advanced_metrics.compute_all_tier2_metrics(lookback_days)
+            result["tier2"] = tier2
+        
+        if tier in ["tier3", "all"]:
+            tier3 = await _advanced_metrics.compute_all_tier3_metrics(lookback_days)
+            result["tier3"] = tier3
+        
+        if not result:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid tier parameter. Use: tier1, tier2, tier3, or all"
+            )
+        
+        return result
+        
+    except Exception as e:
+        logger.error("get_core_metrics_failed", error=str(e), tier=tier)
+        raise HTTPException(status_code=500, detail=f"Failed to compute core metrics: {str(e)}")

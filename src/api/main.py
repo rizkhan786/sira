@@ -16,6 +16,8 @@ from src.db.repository import get_repository
 from src.llm.client import get_llm_client
 from src.metrics.collector import MetricsCollector
 from src.metrics.storage import MetricsStorage
+from src.metrics.core_metrics import CoreMetrics
+from src.metrics.advanced_metrics import AdvancedMetrics
 from src.api import metrics as metrics_api
 from src.matlab.episode_logger import EpisodeLogger
 from src.matlab.config_reader import ConfigReader
@@ -27,6 +29,8 @@ reasoning_engine = None
 repository = None
 metrics_collector = None
 metrics_storage = None
+core_metrics = None
+advanced_metrics = None
 episode_logger = None
 config_reader = None
 
@@ -98,7 +102,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup."""
-    global reasoning_engine, repository, metrics_collector, metrics_storage, episode_logger, config_reader
+    global reasoning_engine, repository, metrics_collector, metrics_storage, core_metrics, advanced_metrics, episode_logger, config_reader
     logger.info("Starting SIRA API", env=settings.env, port=settings.api_port)
     
     # Initialize MATLAB integration first (needed by reasoning engine)
@@ -117,6 +121,11 @@ async def startup_event():
     metrics_storage = MetricsStorage(repository.pool)
     metrics_collector = MetricsCollector(storage=metrics_storage)
     metrics_api.set_metrics_storage(metrics_storage)
+    
+    # Initialize core and advanced metrics (DEL-034)
+    core_metrics = CoreMetrics(repository.pool)
+    advanced_metrics = AdvancedMetrics(repository.pool)
+    metrics_api.set_core_metrics(core_metrics, advanced_metrics)
     
     # Initialize episode logger
     episode_logger = EpisodeLogger(
