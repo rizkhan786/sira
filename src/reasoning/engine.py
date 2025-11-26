@@ -9,6 +9,7 @@ from src.patterns.retrieval import PatternRetriever
 from src.reasoning.pattern_prompt import PatternPromptFormatter
 from src.patterns.usage_tracker import PatternUsageTracker
 from src.reasoning.refinement import RefinementLoop, RefinementConfig
+from src.matlab.config_reader import ConfigReader
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -17,7 +18,7 @@ logger = get_logger(__name__)
 class ReasoningEngine:
     """Core reasoning engine with self-improvement capabilities."""
     
-    def __init__(self):
+    def __init__(self, config_reader: ConfigReader = None):
         self.llm_client = get_llm_client()
         self.quality_scorer = QualityScorer()
         self.pattern_extractor = PatternExtractor(
@@ -28,7 +29,27 @@ class ReasoningEngine:
         self.pattern_retriever = PatternRetriever(self.pattern_storage)
         self.pattern_formatter = PatternPromptFormatter()
         self.usage_tracker = PatternUsageTracker()
-        self.refinement_loop = RefinementLoop(RefinementConfig())
+        
+        # Initialize config reader if not provided
+        self.config_reader = config_reader or ConfigReader()
+        
+        # Get MATLAB-optimized config parameters
+        max_iterations = self.config_reader.get_config('max_iterations', default=3)
+        quality_threshold = self.config_reader.get_config('refinement_threshold', default=0.8)
+        
+        # Create refinement config with MATLAB parameters
+        refinement_config = RefinementConfig(
+            max_iterations=max_iterations,
+            quality_threshold=quality_threshold
+        )
+        
+        self.refinement_loop = RefinementLoop(refinement_config)
+        
+        logger.info(
+            "reasoning_engine_initialized",
+            matlab_max_iterations=max_iterations,
+            matlab_quality_threshold=quality_threshold
+        )
         
     async def process_query(
         self,
@@ -334,6 +355,13 @@ Provide a direct answer that incorporates the reasoning above. Be specific and h
         return steps
 
 
-async def create_reasoning_engine() -> ReasoningEngine:
-    """Factory function to create reasoning engine."""
-    return ReasoningEngine()
+async def create_reasoning_engine(config_reader: ConfigReader = None) -> ReasoningEngine:
+    """Factory function to create reasoning engine.
+    
+    Args:
+        config_reader: Optional ConfigReader instance for MATLAB integration
+        
+    Returns:
+        ReasoningEngine instance with MATLAB config applied
+    """
+    return ReasoningEngine(config_reader=config_reader)

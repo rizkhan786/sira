@@ -100,7 +100,16 @@ async def startup_event():
     """Initialize application on startup."""
     global reasoning_engine, repository, metrics_collector, metrics_storage, episode_logger, config_reader
     logger.info("Starting SIRA API", env=settings.env, port=settings.api_port)
-    reasoning_engine = await create_reasoning_engine()
+    
+    # Initialize MATLAB integration first (needed by reasoning engine)
+    config_reader = ConfigReader(
+        config_path="./data/matlab/optimized_config.json",
+        reload_interval=60
+    )
+    
+    # Create reasoning engine with MATLAB config
+    reasoning_engine = await create_reasoning_engine(config_reader=config_reader)
+    
     repository = await get_repository()
     await repository.connect()
     
@@ -109,15 +118,11 @@ async def startup_event():
     metrics_collector = MetricsCollector(storage=metrics_storage)
     metrics_api.set_metrics_storage(metrics_storage)
     
-    # Initialize MATLAB integration
+    # Initialize episode logger
     episode_logger = EpisodeLogger(
         log_path="./data/matlab/episodes.mat",
         batch_size=10,
         export_interval_seconds=3600
-    )
-    config_reader = ConfigReader(
-        config_path="./data/matlab/optimized_config.json",
-        reload_interval=60
     )
     
     logger.info("SIRA API startup complete")

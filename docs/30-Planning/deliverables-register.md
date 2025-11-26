@@ -74,7 +74,7 @@
 **Requirements:** REQ-007  
 **Priority:** Must Have  
 **Target Sprint:** 3  
-**Status:** Not Started  
+**Status:** Complete  
 **Description:** Integrate retrieved patterns into reasoning process and track usage.
 
 ---
@@ -83,7 +83,7 @@
 **Requirements:** REQ-008  
 **Priority:** Must Have  
 **Target Sprint:** 3  
-**Status:** Not Started  
+**Status:** Complete  
 **Description:** Multi-pass reasoning with convergence criteria and iteration management.
 
 ---
@@ -101,7 +101,7 @@
 **Requirements:** REQ-010, NFR-013  
 **Priority:** Must Have  
 **Target Sprint:** 3  
-**Status:** Not Started  
+**Status:** Complete  
 **Description:** Capture and store performance metrics (accuracy, reuse, corrections, timing).
 
 ---
@@ -155,7 +155,7 @@
 **Requirements:** REQ-016  
 **Priority:** Must Have  
 **Target Sprint:** 3  
-**Status:** Not Started  
+**Status:** Complete  
 **Description:** Episode logging for MATLAB and config consumption from MATLAB.
 
 ---

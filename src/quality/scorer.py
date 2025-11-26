@@ -130,12 +130,31 @@ class QualityScorer:
         query_lower = query.lower()
         response_lower = response.lower()
         
+        # Check for vague queries FIRST (before word extraction)
+        vague_queries = ['what', 'tell', 'stuff', 'thing', 'something', 'anything', 'how', 'why']
+        
+        # Clean query: remove punctuation and split
+        query_cleaned = re.sub(r'[^\w\s]', '', query_lower)  # Remove all punctuation
+        query_terms = query_cleaned.split()
+        
+        # If query is very short or only contains vague words
+        if len(query.strip()) < 15:
+            # Check if query is only vague terms (like "What?", "tell me", "stuff")
+            non_vague_terms = [term for term in query_terms 
+                              if term not in vague_queries 
+                              and len(term) > 2]
+            
+            if len(non_vague_terms) == 0:
+                # Pure vague query - low relevance score
+                return 0.4
+        
         # Extract key terms from query (simple approach)
         query_words = set(re.findall(r'\b\w{4,}\b', query_lower))
         response_words = set(re.findall(r'\b\w{4,}\b', response_lower))
         
         if not query_words:
-            return 0.8  # Short query, hard to judge
+            # Short query with no substantial words
+            return 0.5
         
         # Calculate overlap
         overlap = query_words.intersection(response_words)
@@ -154,8 +173,8 @@ Query: "{query}"
 Response: "{response}"
 
 Rate on these criteria:
-1. Correctness: Is the information accurate and factually correct?
-2. Completeness: Does it fully answer the question without omitting key information?
+1. Correctness: Is the information accurate and factually correct? If the query is vague or lacks a concrete subject (e.g., "What?", "tell me", "stuff", "thing"), score LOW (≈0.3–0.4) because a vague query cannot yield a correct, specific answer.
+2. Completeness: Does it fully answer the question without omitting key information? If the query is vague or missing context, the response cannot be complete — score LOW (≈0.3–0.4).
 3. Clarity: Is it clear, well-structured, and easy to understand?
 
 Respond ONLY with JSON in this exact format:

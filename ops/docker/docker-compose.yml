@@ -27,7 +27,7 @@ services:
       - "8080:8080"
     volumes:
       - ../../src:/app/src
-      - sira_data:/data
+      - ../../data:/app/data
     environment:
       - ENV=development
       - POSTGRES_HOST=sira-postgres
