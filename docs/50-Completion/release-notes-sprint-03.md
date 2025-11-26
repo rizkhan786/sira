@@ -357,7 +357,7 @@ For questions or issues:
 ---
 
 **Release Tag:** v03.0  
-**Commit:** [To be added after merge]  
+**Commit:** fb606d6  
 **Branch:** sprint-03 → main  
 **Released By:** Sprint 3 Development Team  
 **Release Date:** 2025-11-19
