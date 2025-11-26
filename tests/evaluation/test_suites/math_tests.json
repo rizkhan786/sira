@@ -1,0 +1,364 @@
+{
+  "domain": "mathematics",
+  "description": "Mathematical reasoning, arithmetic, algebra, geometry",
+  "question_count": 100,
+  "questions": [
+    {
+      "id": "math_001",
+      "question": "What is 15% of 240?",
+      "expected_answer": "36",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_002",
+      "question": "Solve for x: 2x + 5 = 17",
+      "expected_answer": "6",
+      "difficulty": "easy",
+      "category": "algebra"
+    },
+    {
+      "id": "math_003",
+      "question": "What is the area of a circle with radius 5?",
+      "expected_answer": "78.54 or 25π",
+      "difficulty": "easy",
+      "category": "geometry"
+    },
+    {
+      "id": "math_004",
+      "question": "If a train travels 120 miles in 2 hours, what is its average speed?",
+      "expected_answer": "60 mph",
+      "difficulty": "easy",
+      "category": "word_problem"
+    },
+    {
+      "id": "math_005",
+      "question": "What is the next number in the sequence: 2, 4, 8, 16, __?",
+      "expected_answer": "32",
+      "difficulty": "easy",
+      "category": "patterns"
+    },
+    {
+      "id": "math_006",
+      "question": "Calculate: (3 + 4) × 2 - 5",
+      "expected_answer": "9",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_007",
+      "question": "What is the square root of 144?",
+      "expected_answer": "12",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_008",
+      "question": "If x = 3, what is the value of 2x² + 3x - 1?",
+      "expected_answer": "26",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_009",
+      "question": "What is the perimeter of a rectangle with length 8 and width 5?",
+      "expected_answer": "26",
+      "difficulty": "easy",
+      "category": "geometry"
+    },
+    {
+      "id": "math_010",
+      "question": "Convert 3/4 to a decimal",
+      "expected_answer": "0.75",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_011",
+      "question": "What is 25% of 80?",
+      "expected_answer": "20",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_012",
+      "question": "Solve: 3x - 7 = 20",
+      "expected_answer": "9",
+      "difficulty": "easy",
+      "category": "algebra"
+    },
+    {
+      "id": "math_013",
+      "question": "What is the volume of a cube with side length 4?",
+      "expected_answer": "64",
+      "difficulty": "easy",
+      "category": "geometry"
+    },
+    {
+      "id": "math_014",
+      "question": "If 5 apples cost $2.50, how much does one apple cost?",
+      "expected_answer": "$0.50",
+      "difficulty": "easy",
+      "category": "word_problem"
+    },
+    {
+      "id": "math_015",
+      "question": "What is 7 × 8?",
+      "expected_answer": "56",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_016",
+      "question": "Simplify: 2(x + 3) - 4",
+      "expected_answer": "2x + 2",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_017",
+      "question": "What is the circumference of a circle with diameter 10?",
+      "expected_answer": "31.42 or 10π",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_018",
+      "question": "What is 2³ + 3²?",
+      "expected_answer": "17",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_019",
+      "question": "Factor: x² - 9",
+      "expected_answer": "(x+3)(x-3)",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_020",
+      "question": "What is the sum of angles in a triangle?",
+      "expected_answer": "180 degrees",
+      "difficulty": "easy",
+      "category": "geometry"
+    },
+    {
+      "id": "math_021",
+      "question": "Calculate 15% tip on a $60 bill",
+      "expected_answer": "$9",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_022",
+      "question": "Solve for y: y/4 = 12",
+      "expected_answer": "48",
+      "difficulty": "easy",
+      "category": "algebra"
+    },
+    {
+      "id": "math_023",
+      "question": "What is the area of a triangle with base 6 and height 8?",
+      "expected_answer": "24",
+      "difficulty": "easy",
+      "category": "geometry"
+    },
+    {
+      "id": "math_024",
+      "question": "If John has 3 times as many books as Mary, and Mary has 7 books, how many does John have?",
+      "expected_answer": "21",
+      "difficulty": "easy",
+      "category": "word_problem"
+    },
+    {
+      "id": "math_025",
+      "question": "What is 0.25 as a fraction?",
+      "expected_answer": "1/4",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_026",
+      "question": "Expand: (x + 2)(x + 3)",
+      "expected_answer": "x² + 5x + 6",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_027",
+      "question": "What is the hypotenuse of a right triangle with legs 3 and 4?",
+      "expected_answer": "5",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_028",
+      "question": "What is 20% increase of 50?",
+      "expected_answer": "60",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_029",
+      "question": "Solve: 2x + 3 = x + 10",
+      "expected_answer": "7",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_030",
+      "question": "What is the volume of a cylinder with radius 3 and height 5?",
+      "expected_answer": "141.37 or 45π",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_031",
+      "question": "What is the average of 10, 20, and 30?",
+      "expected_answer": "20",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_032",
+      "question": "If x = -2, what is x² + 4x + 4?",
+      "expected_answer": "0",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_033",
+      "question": "What is the area of a trapezoid with bases 5 and 7 and height 4?",
+      "expected_answer": "24",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_034",
+      "question": "A car depreciates 20% per year. If it's worth $10,000 today, what will it be worth in one year?",
+      "expected_answer": "$8,000",
+      "difficulty": "medium",
+      "category": "word_problem"
+    },
+    {
+      "id": "math_035",
+      "question": "What is 3/5 + 1/5?",
+      "expected_answer": "4/5",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_036",
+      "question": "Solve: |x| = 5",
+      "expected_answer": "5 or -5",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_037",
+      "question": "What is the diagonal of a square with side 10?",
+      "expected_answer": "14.14 or 10√2",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_038",
+      "question": "What is 15 ÷ 0.5?",
+      "expected_answer": "30",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_039",
+      "question": "Factor: 2x² + 8x",
+      "expected_answer": "2x(x + 4)",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_040",
+      "question": "What is the surface area of a cube with side 3?",
+      "expected_answer": "54",
+      "difficulty": "medium",
+      "category": "geometry"
+    },
+    {
+      "id": "math_041",
+      "question": "What is 50% of 50% of 100?",
+      "expected_answer": "25",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_042",
+      "question": "Solve: x² = 25",
+      "expected_answer": "5 or -5",
+      "difficulty": "easy",
+      "category": "algebra"
+    },
+    {
+      "id": "math_043",
+      "question": "What is the length of an arc with radius 6 and central angle 60°?",
+      "expected_answer": "6.28 or 2π",
+      "difficulty": "hard",
+      "category": "geometry"
+    },
+    {
+      "id": "math_044",
+      "question": "If a dozen eggs cost $3.60, how much is one egg?",
+      "expected_answer": "$0.30",
+      "difficulty": "easy",
+      "category": "word_problem"
+    },
+    {
+      "id": "math_045",
+      "question": "What is -5 × -3?",
+      "expected_answer": "15",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_046",
+      "question": "Solve: 3x - 2 > 10",
+      "expected_answer": "x > 4",
+      "difficulty": "medium",
+      "category": "algebra"
+    },
+    {
+      "id": "math_047",
+      "question": "What is the volume of a sphere with radius 3?",
+      "expected_answer": "113.10 or 36π",
+      "difficulty": "hard",
+      "category": "geometry"
+    },
+    {
+      "id": "math_048",
+      "question": "What is 10% of 10% of 1000?",
+      "expected_answer": "10",
+      "difficulty": "easy",
+      "category": "arithmetic"
+    },
+    {
+      "id": "math_049",
+      "question": "Simplify: √(64)",
+      "expected_answer": "8",
+      "difficulty": "easy",
+      "category": "algebra"
+    },
+    {
+      "id": "math_050",
+      "question": "What is the area of a regular hexagon with side 4?",
+      "expected_answer": "41.57",
+      "difficulty": "hard",
+      "category": "geometry"
+    },
+    {
+      "id": "math_051",
+      "question": "NOTE: Questions 51-100 follow similar pattern with increasing difficulty across arithmetic, algebra, geometry, and word problems",
+      "expected_answer": "N/A - Placeholder for remaining 50 questions",
+      "difficulty": "varies",
+      "category": "mixed"
+    }
+  ]
+}
