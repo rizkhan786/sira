@@ -9,6 +9,9 @@ sqlalchemy[asyncio]>=2.0.23
 asyncpg>=0.29.0
 psycopg2-binary>=2.9.9
 
+# Caching
+redis[hiredis]>=5.0.1
+
 # Vector DB
 chromadb>=0.4.18
 

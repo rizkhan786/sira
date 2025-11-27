@@ -1,7 +1,7 @@
 """Pattern retrieval and ranking for query processing."""
 
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -15,15 +15,17 @@ class PatternRetriever:
     WEIGHT_SUCCESS_RATE = 0.15
     WEIGHT_USAGE_COUNT = 0.05
     
-    def __init__(self, pattern_storage):
+    def __init__(self, pattern_storage, cache_manager=None):
         """Initialize pattern retriever.
         
         Args:
             pattern_storage: PatternStorage instance
+            cache_manager: Optional CacheManager for performance
         """
         self.storage = pattern_storage
+        self.cache = cache_manager
         
-    def retrieve_patterns(
+    async def retrieve_patterns(
         self,
         query: str,
         n_results: int = 3,
@@ -49,6 +51,16 @@ class PatternRetriever:
                 "min_quality": min_quality
             }
         )
+        
+        # Check cache first
+        if self.cache:
+            cached = await self.cache.get_patterns(query, n_results, min_quality)
+            if cached is not None:
+                logger.info(
+                    "patterns_from_cache",
+                    extra={"count": len(cached)}
+                )
+                return cached
         
         # Search for similar patterns
         similar_patterns = self.storage.search_similar_patterns(
@@ -93,6 +105,10 @@ class PatternRetriever:
                 "top_pattern_score": top_patterns[0]['ranking_score'] if top_patterns else 0
             }
         )
+        
+        # Cache the results for next time
+        if self.cache and top_patterns:
+            await self.cache.set_patterns(query, n_results, min_quality, top_patterns)
         
         return top_patterns
     

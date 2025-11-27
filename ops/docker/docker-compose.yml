@@ -37,6 +37,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - CHROMADB_HOST=sira-chromadb
       - CHROMADB_PORT=8000
+      - REDIS_HOST=sira-redis
+      - REDIS_PORT=6379
       - LLM_BASE_URL=http://sira-llm:11434
       - LLM_MODEL_GENERAL=${LLM_MODEL_GENERAL:-llama3.2:3b}
       - LOG_LEVEL=DEBUG
@@ -45,6 +47,8 @@ services:
         condition: service_healthy
       sira-chromadb:
         condition: service_started
+      sira-redis:
+        condition: service_healthy
       sira-llm:
         condition: service_healthy
     networks:
@@ -84,6 +88,22 @@ services:
     networks:
       - sira_network
 
+  sira-redis:
+    image: redis:7-alpine
+    container_name: sira-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - sira_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
 networks:
   sira_network:
     driver: bridge
@@ -92,4 +112,5 @@ volumes:
   postgres_data:
   chromadb_data:
   ollama_data:
+  redis_data:
   sira_data:
