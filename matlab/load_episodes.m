@@ -31,10 +31,14 @@ function data = load_episodes(filepath)
     
     % Extract episodes array if available
     if isfield(data, 'episodes')
-        episodes = data.episodes;
+        data = data.episodes;  % Return episodes array directly
         fprintf('Episode structure fields: ');
-        if ~isempty(episodes)
-            fields = fieldnames(episodes{1});
+        if ~isempty(data)
+            if iscell(data)
+                fields = fieldnames(data{1});
+            else
+                fields = fieldnames(data(1));
+            end
             fprintf('%s ', fields{:});
         end
         fprintf('\n');

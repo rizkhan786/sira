@@ -46,8 +46,9 @@ n_cells = numel(quality_matrix);
 n_populated = sum(~isnan(quality_matrix(:)));
 coverage_pct = (n_populated / n_cells) * 100;
 
-subtitle_str = sprintf('Coverage: %.1f%% (%d/%d combinations)', ...
-                       coverage_pct, n_populated, n_cells);
-subtitle(subtitle_str);
+% Update title with statistics (subtitle not supported with heatmap)
+title_str = sprintf('Pattern Effectiveness by Domain\nCoverage: %.1f%% (%d/%d combinations)', ...
+                    coverage_pct, n_populated, n_cells);
+h.Title = title_str;
 
 end
