@@ -58,10 +58,10 @@ class CoreMetrics:
             
             # Simple linear regression for trend
             n = len(rows)
-            sum_x = sum(row["hours_elapsed"] for row in rows)
-            sum_y = sum(row["quality_score"] for row in rows)
-            sum_xy = sum(row["hours_elapsed"] * row["quality_score"] for row in rows)
-            sum_x2 = sum(row["hours_elapsed"] ** 2 for row in rows)
+            sum_x = sum(float(row["hours_elapsed"]) for row in rows)
+            sum_y = sum(float(row["quality_score"]) for row in rows)
+            sum_xy = sum(float(row["hours_elapsed"]) * float(row["quality_score"]) for row in rows)
+            sum_x2 = sum(float(row["hours_elapsed"]) ** 2 for row in rows)
             
             # Slope of regression line = learning velocity
             denominator = (n * sum_x2 - sum_x ** 2)
@@ -138,7 +138,7 @@ class CoreMetrics:
                     AND timestamp > NOW() - $1::INTERVAL
             """, timedelta(hours=lookback_hours))
             
-            avg_quality = row["avg_quality"] or 0.0
+            avg_quality = float(row["avg_quality"]) if row["avg_quality"] is not None else 0.0
             
             logger.info(
                 "average_quality_computed",

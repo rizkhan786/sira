@@ -231,8 +231,8 @@ class AdvancedMetrics:
                     AND timestamp > NOW() - $1::INTERVAL
             """, timedelta(days=lookback_days))
             
-            sira_avg = sira_row["avg_quality"] or 0.0
-            baseline_avg = baseline_row["avg_quality"] or 0.01
+            sira_avg = float(sira_row["avg_quality"]) if sira_row["avg_quality"] is not None else 0.0
+            baseline_avg = float(baseline_row["avg_quality"]) if baseline_row["avg_quality"] is not None else 0.01
             
             improvement = ((sira_avg - baseline_avg) / baseline_avg * 100) if baseline_avg > 0 else 0.0
             
@@ -276,8 +276,8 @@ class AdvancedMetrics:
             results = [
                 {
                     "domain": row["domain"],
-                    "avg_quality": round(row["avg_quality"], 3),
-                    "query_count": row["query_count"]
+                    "avg_quality": round(float(row["avg_quality"]), 3),
+                    "query_count": int(row["query_count"])
                 }
                 for row in rows
             ]
@@ -314,8 +314,8 @@ class AdvancedMetrics:
                     AND timestamp > NOW() - $1::INTERVAL
             """, timedelta(days=lookback_days))
             
-            avg_quality = row["avg_quality"] or 0.0
-            speed_factor = row["response_speed_factor"] or 0.5
+            avg_quality = float(row["avg_quality"]) if row["avg_quality"] is not None else 0.0
+            speed_factor = float(row["response_speed_factor"]) if row["response_speed_factor"] is not None else 0.5
             
             # Weighted satisfaction: 70% quality, 30% speed
             satisfaction = (0.7 * avg_quality) + (0.3 * speed_factor)
