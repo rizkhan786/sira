@@ -104,6 +104,22 @@ services:
       timeout: 3s
       retries: 5
 
+  sira-web:
+    image: node:20-alpine
+    container_name: sira-web
+    working_dir: /app
+    volumes:
+      - ../../web:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - sira_network
+    depends_on:
+      - sira-api
+
 networks:
   sira_network:
     driver: bridge
