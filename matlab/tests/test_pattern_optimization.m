@@ -196,7 +196,7 @@ function [patterns, episodes] = setup_test_data()
     patterns(1).domain = 'math';
     patterns(1).content = 'Analyze problem mathematically';
     patterns(1).embedding = randn(768, 1);  % Random embedding
-    patterns(1).quality = 0.85;
+    patterns(1).quality_score = 0.85;
     patterns(1).usage_count = 25;
     
     % Pattern 2: Similar to pattern 1 (should be clustered together)
@@ -205,7 +205,7 @@ function [patterns, episodes] = setup_test_data()
     patterns(2).domain = 'math';
     patterns(2).content = 'Use mathematical reasoning';
     patterns(2).embedding = patterns(1).embedding + 0.01 * randn(768, 1);  % Very similar
-    patterns(2).quality = 0.83;
+    patterns(2).quality_score = 0.83;
     patterns(2).usage_count = 20;
     
     % Pattern 3: Another similar to pattern 1
@@ -214,7 +214,7 @@ function [patterns, episodes] = setup_test_data()
     patterns(3).domain = 'math';
     patterns(3).content = 'Apply quantitative analysis';
     patterns(3).embedding = patterns(1).embedding + 0.02 * randn(768, 1);  % Very similar
-    patterns(3).quality = 0.80;
+    patterns(3).quality_score = 0.80;
     patterns(3).usage_count = 15;
     
     % Pattern 4: Science pattern, different embedding
@@ -223,7 +223,7 @@ function [patterns, episodes] = setup_test_data()
     patterns(4).domain = 'science';
     patterns(4).content = 'Apply scientific method';
     patterns(4).embedding = randn(768, 1);  % Different embedding
-    patterns(4).quality = 0.78;
+    patterns(4).quality_score = 0.78;
     patterns(4).usage_count = 10;
     
     % Pattern 5: History pattern, different embedding
@@ -232,7 +232,7 @@ function [patterns, episodes] = setup_test_data()
     patterns(5).domain = 'history';
     patterns(5).content = 'Consider historical context';
     patterns(5).embedding = randn(768, 1);  % Different embedding
-    patterns(5).quality = 0.75;
+    patterns(5).quality_score = 0.75;
     patterns(5).usage_count = 8;
     
     % Normalize embeddings for cosine similarity
@@ -247,7 +247,7 @@ function [patterns, episodes] = setup_test_data()
     for i = 1:3
         episodes(i).id = sprintf('ep-%03d', i);
         episodes(i).domain = 'math';
-        episodes(i).quality = 0.8 + 0.05 * rand();
+        episodes(i).quality_score = 0.8 + 0.05 * rand();
         episodes(i).patterns_used = {patterns(1).id, patterns(2).id};
     end
     
@@ -255,7 +255,7 @@ function [patterns, episodes] = setup_test_data()
     for i = 4:5
         episodes(i).id = sprintf('ep-%03d', i);
         episodes(i).domain = 'science';
-        episodes(i).quality = 0.75 + 0.05 * rand();
+        episodes(i).quality_score = 0.75 + 0.05 * rand();
         episodes(i).patterns_used = {patterns(4).id};
     end
     
@@ -263,7 +263,7 @@ function [patterns, episodes] = setup_test_data()
     for i = 6:8
         episodes(i).id = sprintf('ep-%03d', i);
         episodes(i).domain = 'geography';
-        episodes(i).quality = 0.65 + 0.05 * rand();
+        episodes(i).quality_score = 0.65 + 0.05 * rand();
         episodes(i).patterns_used = {};  % No patterns available
     end
 end
