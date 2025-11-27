@@ -33,14 +33,14 @@ Implement comprehensive MATLAB analytics and SIRA-specific metrics framework to 
 - Pattern library browser
 
 **Acceptance Criteria:**
-- AC-024: Web interface loads and displays query form
-- AC-025: Reasoning traces render with step-by-step visualization
-- AC-026: Metrics dashboard shows current statistics
+- AC-082: Web interface loads at http://localhost:3000 with query submission form
+- AC-083: Reasoning trace rendered as expandable steps with quality scores
+- AC-084: Metrics dashboard displays real-time stats from /metrics/summary
 
 **Test Cases:**
-- TC-024: Verify web interface renders without errors
-- TC-025: Test query submission and response display
-- TC-026: Validate metrics dashboard updates in real-time
+- TC-082: Verify web interface renders without errors
+- TC-083: Test query submission and reasoning trace visualization
+- TC-084: Validate metrics dashboard fetches and displays metrics
 
 ---
 
@@ -57,14 +57,14 @@ Implement comprehensive MATLAB analytics and SIRA-specific metrics framework to 
 - Reduce query latency by 30%+
 
 **Acceptance Criteria:**
-- AC-042: Query latency reduced by 30%+ vs. baseline
-- AC-043: Concurrent queries handled without blocking
-- AC-044: Cache hit rate >60% for pattern retrieval
+- AC-085: Query latency reduced by 30%+ vs. baseline (Sprint 3: 25s → target: <17.5s)
+- AC-086: System handles 10 concurrent queries without blocking
+- AC-087: Redis cache hit rate > 60% for pattern retrieval queries
 
 **Test Cases:**
-- TC-042: Load test with 10 concurrent queries
-- TC-043: Measure latency improvement before/after
-- TC-044: Verify cache effectiveness
+- TC-085: Performance test before/after optimization
+- TC-086: Load test with 10 concurrent users
+- TC-087: Monitor cache metrics after 100 queries
 
 ---
 
@@ -81,14 +81,14 @@ Implement comprehensive MATLAB analytics and SIRA-specific metrics framework to 
 - Scalability report
 
 **Acceptance Criteria:**
-- AC-048: System handles 100K patterns without degradation
-- AC-049: 50 concurrent queries complete successfully
-- AC-050: Performance report documents bottlenecks
+- AC-088: System handles 100K patterns with retrieval < 1s per query
+- AC-089: 50 concurrent users submit queries with < 5% error rate
+- AC-090: Performance report documents bottlenecks, latency percentiles, resource utilization
 
 **Test Cases:**
-- TC-048: Load 100K patterns and measure retrieval time
-- TC-049: Run 50 concurrent queries via load testing tool
-- TC-050: Generate and validate performance report
+- TC-088: Load 100K patterns and measure retrieval time
+- TC-089: Load test with locust, 50 concurrent users
+- TC-090: Verify report generated with all required metrics
 
 ---
 
@@ -107,14 +107,14 @@ Implement comprehensive MATLAB analytics and SIRA-specific metrics framework to 
 - Automated PDF report generation
 
 **Acceptance Criteria:**
-- AC-076: Dashboard loads episode logs and computes core metrics
-- AC-077: Visualizations render quality trends, pattern usage, domain coverage
-- AC-078: PDF report auto-generated with insights and recommendations
+- AC-070: Dashboard loads episodes.mat and computes learning velocity
+- AC-071: Pattern effectiveness heatmap generated
+- AC-072: PDF report auto-generated with visualizations, metrics, insights, recommendations
 
 **Test Cases:**
-- TC-076: Verify dashboard processes 1000+ episodes without error
-- TC-077: Validate all visualizations render correctly with sample data
-- TC-078: Confirm PDF report generation includes all metrics
+- TC-070: Verify dashboard processes 1000+ episodes without error
+- TC-071: Validate all visualizations render correctly with sample data
+- TC-072: Confirm PDF report generation includes all metrics
 
 **Files to Create:**
 - `matlab/sira_dashboard.m` - Main dashboard script
@@ -139,14 +139,14 @@ Implement comprehensive MATLAB analytics and SIRA-specific metrics framework to 
 - Transfer learning matrix (domain similarity analysis)
 
 **Acceptance Criteria:**
-- AC-082: Clustering identifies and merges redundant patterns
-- AC-083: Distillation reduces library size by 20%+ without quality loss
-- AC-084: Gap analysis recommends priority domains for pattern collection
+- AC-073: Clustering identifies similar patterns (cosine similarity > 0.9)
+- AC-074: Distillation reduces library size by 20%+ without quality loss (< 2% quality degradation)
+- AC-075: Gap analysis identifies underserved domains (< 5 patterns) and recommends priorities
 
 **Test Cases:**
-- TC-082: Verify clustering on 100 patterns produces valid groups
-- TC-083: Validate distillation maintains quality within 2% of original
-- TC-084: Confirm gap analysis identifies low-coverage domains
+- TC-073: Verify clustering on 100 patterns produces valid groups
+- TC-074: Validate distillation maintains quality within 2% of original
+- TC-075: Confirm gap analysis identifies low-coverage domains
 
 **Files to Create:**
 - `matlab/optimization/cluster_patterns.m` - Pattern clustering
@@ -182,14 +182,14 @@ Implementation of 10 SIRA-specific metrics across 3 tiers:
 10. User Satisfaction: Feedback-based scoring
 
 **Acceptance Criteria:**
-- AC-088: All Tier 1 metrics computed for every query
-- AC-089: Metrics persisted to database with timestamps
-- AC-090: API endpoint exposes current metrics
+- AC-076: All Tier 1 metrics (learning velocity, pattern utilization, avg quality, domain coverage) computed
+- AC-077: Metrics persisted to database with timestamps
+- AC-078: API endpoint `/metrics/core` returns all 10 metrics
 
 **Test Cases:**
-- TC-088: Verify metric computation accuracy on test dataset
-- TC-089: Validate metric storage and retrieval
-- TC-090: Test API returns metrics in correct format
+- TC-076: Verify metric computation accuracy on test dataset
+- TC-077: Validate metric storage and retrieval
+- TC-078: Test API returns metrics in correct format
 
 **Files to Create:**
 - `src/metrics/__init__.py` - Metrics module
@@ -242,14 +242,14 @@ Comprehensive testing framework for SIRA-specific evaluation:
 - General Knowledge: 50 questions
 
 **Acceptance Criteria:**
-- AC-091: Test suites cover 8+ domains with 50+ questions each
-- AC-092: Baseline comparison shows statistical significance
-- AC-093: Learning trajectory tracked over 1000+ queries
+- AC-079: Test suites cover 8+ domains with 430+ questions total (86% of 500 target)
+- AC-080: Baseline comparator implements statistical significance testing (paired t-test)
+- AC-081: Trajectory analyzer computes R² and detects learning trends
 
 **Test Cases:**
-- TC-091: Run full evaluation suite and verify completion
-- TC-092: Compare SIRA vs baseline on test set
-- TC-093: Track metrics over 1000 synthetic queries
+- TC-079: Run full evaluation suite and verify completion
+- TC-080: Compare SIRA vs baseline on test set with statistical analysis
+- TC-081: Track metrics over 1000 synthetic queries with trajectory analysis
 
 **Files to Create:**
 - `src/evaluation/__init__.py` - Evaluation module
