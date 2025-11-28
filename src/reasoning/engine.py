@@ -73,7 +73,7 @@ class ReasoningEngine:
         
         try:
             # Retrieve similar patterns before reasoning
-            retrieved_patterns = self.pattern_retriever.retrieve_patterns(
+            retrieved_patterns = await self.pattern_retriever.retrieve_patterns(
                 query=query,
                 n_results=3,
                 min_quality=0.7,
