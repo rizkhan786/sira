@@ -59,7 +59,9 @@ export default function ReasoningTrace({ result }) {
     );
   }
 
-  const { response, reasoning_trace, quality_score, patterns_retrieved } = result;
+  const { response, reasoning_steps, metadata } = result;
+  const quality_score = metadata?.quality_score;
+  const patterns_retrieved = metadata?.patterns_retrieved_count;
 
   return (
     <div className="reasoning-trace-container">
@@ -76,9 +78,9 @@ export default function ReasoningTrace({ result }) {
         )}
       </div>
 
-      {reasoning_trace && reasoning_trace.length > 0 && (
+      {reasoning_steps && reasoning_steps.length > 0 && (
         <div className="trace-steps">
-          {reasoning_trace.map((step, index) => (
+          {reasoning_steps.map((step, index) => (
             <ReasoningStep key={index} step={step} index={index} />
           ))}
         </div>

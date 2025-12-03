@@ -62,12 +62,12 @@ export default function MetricsDashboard() {
         <div className="metric-card">
           <div className="metric-label">Avg Latency</div>
           <div className="metric-value">
-            {metrics?.avg_latency ? metrics.avg_latency.toFixed(2) + 's' : 'N/A'}
+            {metrics?.avg_latency_ms ? (metrics.avg_latency_ms / 1000).toFixed(1) + 's' : 'N/A'}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Patterns Stored</div>
-          <div className="metric-value">{metrics?.patterns_stored || 0}</div>
+          <div className="metric-value">{metrics?.pattern_library_size || 0}</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Pattern Reuse Rate</div>
