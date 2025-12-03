@@ -457,15 +457,281 @@
 
 ---
 
+### DEL-040: Standard Benchmark Runner (HumanEval & GSM8K)
+**Requirements:** NFR-009 (Testing/Evaluation)  
+**Priority:** Must Have  
+**Target Sprint:** 5  
+**Status:** Not Started  
+**Description:** Automated benchmark execution system for industry-standard AI evaluation benchmarks. Runs HumanEval (coding) and GSM8K (math) with statistical analysis.
+
+**Components:**
+- **Dataset Loader:** Download and parse HumanEval (164 problems) and GSM8K (8,500 problems)
+- **Benchmark Executor:** Run queries through SIRA with configurable batch sizes
+- **Answer Parser:** Extract and validate answers from LLM responses
+- **Automated Scorer:** Compare against ground truth with fuzzy matching
+- **Progress Tracker:** Real-time progress display with ETA
+- **Result Storage:** Persist results to database for analysis
+- **Retry Logic:** Handle failures gracefully
+- **Checkpoint System:** Resume interrupted runs
+
+**Benchmark Details:**
+
+**HumanEval (164 problems):**
+- Python function completion tasks
+- Automated test case execution
+- pass@1, pass@10, pass@100 metrics
+- Estimated runtime: 82 minutes (164 × 30s)
+
+**GSM8K (8,500 problems - run 1,000 sample):**
+- Grade school math word problems
+- Multi-step reasoning required
+- Exact answer matching
+- Estimated runtime: 8.3 hours (1,000 × 30s)
+
+**Acceptance Criteria:**
+- AC-106: System downloads and parses HumanEval and GSM8K datasets
+- AC-107: Benchmark runs execute all problems through SIRA API
+- AC-108: Automated scoring matches ground truth (>95% accuracy)
+- AC-109: Results stored with metadata (timestamp, model, patterns used)
+- AC-110: Checkpoint system allows resuming interrupted runs
+
+**Files to Create:**
+- `src/benchmarks/__init__.py`
+- `src/benchmarks/base_benchmark.py` - Abstract base class
+- `src/benchmarks/humaneval.py` - HumanEval implementation
+- `src/benchmarks/gsm8k.py` - GSM8K implementation
+- `src/benchmarks/runner.py` - Execution engine
+- `src/benchmarks/scorer.py` - Answer validation
+- `scripts/run_benchmarks.py` - CLI interface
+
+---
+
+### DEL-041: MMLU Full Suite Runner
+**Requirements:** NFR-009 (Testing/Evaluation)  
+**Priority:** Must Have  
+**Target Sprint:** 5  
+**Status:** Not Started  
+**Description:** Complete MMLU (Massive Multitask Language Understanding) benchmark execution with 14,042 questions across 57 subjects.
+
+**Components:**
+- **MMLU Dataset Manager:** Download and organize 57 subject files
+- **Subject-Level Execution:** Run benchmarks by subject with progress tracking
+- **Multiple Choice Parser:** Extract A/B/C/D answers from LLM responses
+- **5-Shot Prompting:** Format questions with 5 examples per subject
+- **Parallel Execution:** Run multiple subjects concurrently (optional)
+- **Per-Subject Scoring:** Calculate accuracy for each of 57 subjects
+- **Category Aggregation:** Group results by STEM, Humanities, Social Sciences, Other
+- **Distributed Execution:** Support breaking into multiple sessions
+
+**MMLU Coverage (57 subjects):**
+- **STEM (18):** abstract_algebra, anatomy, astronomy, biology, chemistry, etc.
+- **Humanities (13):** philosophy, history, prehistory, world_religions, etc.
+- **Social Sciences (12):** econometrics, psychology, sociology, jurisprudence, etc.
+- **Other (14):** professional_medicine, business_ethics, marketing, etc.
+
+**Execution Strategy:**
+```
+Total Questions: 14,042
+Estimated Time: ~117 hours (14,042 × 30s)
+Recommended: Run overnight/weekend or in batches
+
+Batch Strategy:
+- Day 1: STEM subjects (4,500 questions, ~37 hours)
+- Day 2: Humanities (3,200 questions, ~27 hours)
+- Day 3: Social Sciences (3,400 questions, ~28 hours)
+- Day 4: Other subjects (2,942 questions, ~25 hours)
+```
+
+**Acceptance Criteria:**
+- AC-111: System downloads complete MMLU dataset (57 subjects, 14,042 questions)
+- AC-112: 5-shot prompting correctly formats questions with examples
+- AC-113: All 57 subjects execute successfully with progress tracking
+- AC-114: Per-subject and category-level accuracy calculated
+- AC-115: Distributed execution supports multi-day runs with state persistence
+
+**Files to Create:**
+- `src/benchmarks/mmlu.py` - MMLU implementation
+- `src/benchmarks/mmlu_subjects.py` - Subject definitions
+- `src/benchmarks/mmlu_formatter.py` - 5-shot prompt builder
+- `scripts/run_mmlu.py` - CLI with subject selection
+- `data/benchmarks/mmlu/` - Dataset storage
+
+---
+
+### DEL-042: Benchmark Comparison & Analysis System
+**Requirements:** NFR-009 (Testing/Evaluation), NFR-013 (Metrics)  
+**Priority:** Must Have  
+**Target Sprint:** 5  
+**Status:** Not Started  
+**Description:** Comprehensive analysis and reporting system that compares SIRA performance against published baselines for major LLMs (GPT-4, Claude, LLaMA, Gemini, etc.).
+
+**Components:**
+- **Baseline Database:** Curated dataset of published benchmark scores for major models
+- **Statistical Analysis:** T-tests, confidence intervals, effect sizes
+- **Learning Curve Analyzer:** Track improvement over queries
+- **Domain Profiler:** Identify strengths/weaknesses by subject
+- **Comparison Visualizer:** Generate comparison charts and tables
+- **Regression Detector:** Alert when performance drops
+- **Leaderboard Generator:** Rank SIRA against competitors
+
+**Baseline Models Included:**
+```
+Model Baselines (from published papers/leaderboards):
+
+MMLU Scores:
+- GPT-4: 86.4%
+- GPT-4 Turbo: 85.4%
+- Claude 3 Opus: 86.8%
+- Claude 3 Sonnet: 79.0%
+- Gemini Ultra: 90.0%
+- Gemini Pro: 79.1%
+- LLaMA 3 70B: 82.0%
+- LLaMA 3 8B: 68.4%
+- LLaMA 3.2 3B: ~55-60% (estimated)
+- Mistral 7B: 64.2%
+- Mixtral 8x7B: 70.6%
+
+HumanEval (pass@1):
+- GPT-4: 67.0%
+- GPT-4 Turbo: 85.4%
+- Claude 3 Opus: 84.9%
+- Claude 3.5 Sonnet: 92.0%
+- DeepSeek-Coder 33B: 78.6%
+- LLaMA 3 70B: ~50-60% (estimated)
+- LLaMA 3.2 3B: ~20-30% (estimated)
+
+GSM8K:
+- GPT-4: 92.0%
+- Claude 3 Opus: 95.0%
+- Gemini Ultra: 94.4%
+- LLaMA 3 70B: 93.0%
+- LLaMA 3 8B: 79.6%
+- LLaMA 3.2 3B: ~50-60% (estimated)
+```
+
+**Analysis Features:**
+1. **Head-to-Head Comparison:** SIRA vs specific model
+2. **Category Analysis:** Where SIRA excels (math, coding, reasoning)
+3. **Learning Progression:** Performance over time/queries
+4. **Pattern Learning Impact:** With vs without patterns
+5. **Domain Heat Map:** Visual comparison across subjects
+6. **Statistical Significance:** P-values for claimed improvements
+
+**Acceptance Criteria:**
+- AC-116: Baseline database contains scores for 10+ major LLMs
+- AC-117: Statistical analysis calculates confidence intervals (95% CI)
+- AC-118: Learning curve visualized showing improvement over queries
+- AC-119: Domain profiler identifies top 5 strengths and bottom 5 weaknesses
+- AC-120: Comparison report includes statistical significance tests
+
+**Files to Create:**
+- `src/benchmarks/baselines.py` - Baseline data and loader
+- `src/benchmarks/comparison.py` - Comparison engine
+- `src/benchmarks/statistics.py` - Statistical tests
+- `src/benchmarks/visualizer.py` - Chart generation
+- `data/baselines/llm_scores.json` - Published scores database
+
+---
+
+### DEL-043: Automated Benchmark Reporting System
+**Requirements:** NFR-012 (Observability), NFR-013 (Metrics)  
+**Priority:** Must Have  
+**Target Sprint:** 5  
+**Status:** Not Started  
+**Description:** Comprehensive automated report generation system that produces publication-quality reports comparing SIRA to industry baselines.
+
+**Components:**
+- **PDF Report Generator:** Professional reports with charts and tables
+- **HTML Dashboard:** Interactive web-based results viewer
+- **Markdown Export:** GitHub-friendly format
+- **Chart Generation:** Matplotlib/Seaborn visualizations
+- **Table Formatting:** LaTeX-quality tables
+- **Executive Summary:** Auto-generated key findings
+- **Methodology Section:** Reproducibility documentation
+
+**Report Sections:**
+
+**1. Executive Summary**
+- Overall performance summary
+- Key findings (3-5 bullet points)
+- Improvement over baseline
+- Recommendations
+
+**2. Benchmark Results**
+- MMLU: Overall score + per-subject breakdown
+- HumanEval: pass@1, pass@10 scores
+- GSM8K: Overall accuracy + difficulty analysis
+
+**3. Comparative Analysis**
+- Leaderboard: SIRA ranked against competitors
+- Category comparison: STEM, Humanities, Social Sciences
+- Domain heat map: Visual comparison across subjects
+- Statistical significance: P-values and confidence intervals
+
+**4. Learning Analysis**
+- Learning curve: Performance over queries
+- Pattern effectiveness: With vs without patterns
+- Convergence analysis: When does improvement plateau?
+- Domain-specific learning: Which domains benefit most?
+
+**5. Strengths & Weaknesses**
+- Top 10 subjects: Where SIRA excels
+- Bottom 10 subjects: Areas for improvement
+- Comparison to similar-sized models
+- Recommendations for future work
+
+**6. Methodology**
+- Dataset details
+- Evaluation protocol
+- Hardware/software environment
+- Reproducibility instructions
+
+**7. Appendices**
+- Complete per-subject scores
+- Failed questions analysis
+- Raw data tables
+- Statistical test details
+
+**Visualizations Included:**
+1. Overall comparison bar chart (SIRA vs top models)
+2. Category radar chart (STEM, Humanities, etc.)
+3. Learning curve line graph
+4. Domain heat map (57 MMLU subjects)
+5. Score distribution histogram
+6. Confidence interval error bars
+7. Pattern effectiveness comparison
+
+**Acceptance Criteria:**
+- AC-121: PDF report generated with all 7 sections
+- AC-122: Report includes 7+ publication-quality visualizations
+- AC-123: HTML dashboard provides interactive exploration
+- AC-124: Executive summary auto-generated based on results
+- AC-125: Report can be regenerated anytime with updated data
+
+**Files to Create:**
+- `src/benchmarks/reports/__init__.py`
+- `src/benchmarks/reports/pdf_generator.py` - PDF creation
+- `src/benchmarks/reports/html_dashboard.py` - Web dashboard
+- `src/benchmarks/reports/visualizations.py` - Chart generation
+- `src/benchmarks/reports/templates/` - Report templates
+- `scripts/generate_report.py` - CLI interface
+
+**Output Examples:**
+- `reports/sira_benchmark_report_2025-12-03.pdf`
+- `reports/sira_benchmark_dashboard.html`
+- `reports/sira_benchmark_summary.md`
+
+---
+
 ## Deliverables Summary
 
-**Total Deliverables:** 39
+**Total Deliverables:** 43
 **Phase 1 (Sprints 1-3):** 24  
-**Phase 2 (Sprint 4-5):** 10  
+**Phase 2 (Sprint 4-5):** 14  
 **Phase 3 (Sprint 6-7):** 5
 
 ### By Priority
-- **Must Have:** 24 (DEL-030 moved to Should Have)
+- **Must Have:** 28 (includes DEL-040, DEL-041, DEL-042, DEL-043)
 - **Should Have:** 10 (includes DEL-026, DEL-030, DEL-032, DEL-033, DEL-036, DEL-037)
 - **Could Have:** 5 (DEL-027, DEL-028, DEL-029, DEL-031, DEL-038, DEL-039)
 
@@ -475,8 +741,8 @@
 - **Sprint 3:** DEL-007, DEL-008, DEL-010, DEL-016 (4 deliverables)
 
 ### By Sprint (Phase 2)
-- **Sprint 4:** DEL-012, DEL-021, DEL-024, DEL-030, DEL-032, DEL-034, DEL-035 (7 deliverables)
-- **Sprint 5:** DEL-026, DEL-031, DEL-033, DEL-036 (4 deliverables)
+- **Sprint 4:** DEL-012, DEL-021, DEL-024, DEL-030, DEL-032, DEL-034, DEL-035 (7 deliverables) ✅ COMPLETE
+- **Sprint 5:** DEL-026, DEL-031, DEL-033, DEL-036, DEL-040, DEL-041, DEL-042, DEL-043 (8 deliverables - benchmark validation focus)
 
 ### By Sprint (Phase 3)
 - **Sprint 6:** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
@@ -494,6 +760,8 @@
 - **Quality:** DEL-022, DEL-023
 - **Performance:** DEL-021, DEL-024
 - **Code Generation:** DEL-037
+- **Benchmarks & Validation:** DEL-040, DEL-041, DEL-042, DEL-043
+- **Knowledge Enhancement:** DEL-038, DEL-039
 
 ### By Status
 - **Not Started:** 36
