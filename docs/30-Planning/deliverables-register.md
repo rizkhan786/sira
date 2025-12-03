@@ -342,15 +342,49 @@
 
 ---
 
+### DEL-037: Code Generation & Execution Capability
+**Requirements:** NFR-015 (LLM extensibility)  
+**Priority:** Should Have  
+**Target Sprint:** 6 (Phase 3)  
+**Status:** Not Started  
+**Description:** Add code generation and execution capabilities to SIRA. Includes:
+- Integration with code-specialized LLM (e.g., DeepSeek-Coder, CodeLlama, or similar)
+- Code syntax validation and linting
+- Safe sandboxed code execution environment (Docker-based)
+- Multi-language support (Python, JavaScript, etc.)
+- Code testing and verification
+- Code pattern extraction for reuse
+- Integration with existing reasoning engine
+
+**Technical Considerations:**
+- **LLM Model Selection:** Need to evaluate and select appropriate code model:
+  - DeepSeek-Coder (open-source, strong coding performance)
+  - CodeLlama (Meta, good for code completion)
+  - StarCoder (BigCode, multi-language support)
+  - Or fine-tuned variant of current llama3.2 model
+- **Execution Safety:** Sandbox environment with resource limits, timeouts, and security constraints
+- **Testing Framework:** Automated test generation and validation for generated code
+- **Pattern Learning:** Extract successful code patterns for reuse (algorithms, data structures, design patterns)
+
+**Acceptance Criteria:**
+- AC-091: System can generate syntactically correct code in at least 2 languages
+- AC-092: Generated code executes successfully in sandboxed environment
+- AC-093: Code quality scoring integrated with existing quality system
+- AC-094: Code patterns extracted and stored for reuse
+- AC-095: Code generation leverages existing reasoning patterns when applicable
+
+---
+
 ## Deliverables Summary
 
-**Total Deliverables:** 36  
+**Total Deliverables:** 37  
 **Phase 1 (Sprints 1-3):** 24  
-**Phase 2 (Sprint 4+):** 12
+**Phase 2 (Sprint 4-5):** 10  
+**Phase 3 (Sprint 6+):** 3
 
 ### By Priority
 - **Must Have:** 24 (DEL-030 moved to Should Have)
-- **Should Have:** 9 (includes DEL-026, DEL-030, DEL-032, DEL-033, DEL-036)
+- **Should Have:** 10 (includes DEL-026, DEL-030, DEL-032, DEL-033, DEL-036, DEL-037)
 - **Could Have:** 3 (DEL-027, DEL-028, DEL-029, DEL-031 - 4 total)
 
 ### By Sprint (Phase 1)
@@ -361,7 +395,7 @@
 ### By Sprint (Phase 2)
 - **Sprint 4:** DEL-012, DEL-021, DEL-024, DEL-030, DEL-032, DEL-034, DEL-035 (7 deliverables)
 - **Sprint 5:** DEL-026, DEL-031, DEL-033, DEL-036 (4 deliverables)
-- **Sprint 6 (Phase 3):** DEL-027, DEL-028, DEL-029 (3 deliverables - community features)
+- **Sprint 6 (Phase 3):** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
 
 ### By Category
 - **Core Reasoning:** DEL-002, DEL-003, DEL-008
@@ -374,6 +408,7 @@
 - **Metrics & Evaluation:** DEL-034, DEL-035, DEL-036
 - **Quality:** DEL-022, DEL-023
 - **Performance:** DEL-021, DEL-024
+- **Code Generation:** DEL-037
 
 ### By Status
 - **Not Started:** 36
