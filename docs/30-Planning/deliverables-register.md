@@ -375,17 +375,99 @@
 
 ---
 
+### DEL-038: Retrieval-Augmented Generation (RAG) System
+**Requirements:** NFR-015 (LLM extensibility)  
+**Priority:** Could Have  
+**Target Sprint:** 7 (Phase 3)  
+**Status:** Not Started  
+**Description:** Add external knowledge retrieval capability to overcome LLM training cutoff limitations. Enables SIRA to access current information, documentation, and domain-specific knowledge.
+
+**Components:**
+- **Document Ingestion:** Load and index external documents (PDFs, web pages, documentation)
+- **Vector Store:** Embed and store documents in searchable format (extend ChromaDB usage)
+- **Retrieval Pipeline:** Query-based document retrieval with relevance ranking
+- **Context Integration:** Inject retrieved context into LLM prompts
+- **Citation System:** Track and display sources for retrieved information
+- **Web Search Integration:** Optional internet search capability for current events
+- **Update Mechanism:** Periodic refresh of knowledge base
+
+**Technical Considerations:**
+- **Embedding Model:** Sentence transformers for document embeddings
+- **Chunk Strategy:** Split documents into meaningful chunks (500-1000 tokens)
+- **Retrieval Methods:** 
+  - Semantic similarity (vector search)
+  - Hybrid search (vector + keyword)
+  - Re-ranking for relevance
+- **Source Types:**
+  - Local documentation files
+  - API documentation (OpenAPI specs)
+  - Optional web search (DuckDuckGo, Serper, etc.)
+- **Privacy:** No external data sent without user consent
+
+**Use Cases:**
+- Query current technology documentation
+- Access up-to-date API references
+- Lookup recent framework updates
+- Search internal company documentation
+- Optional: Current events, news (with user approval)
+
+**Acceptance Criteria:**
+- AC-096: System can ingest and index documents from local filesystem
+- AC-097: Retrieval returns relevant context for queries (>80% relevance)
+- AC-098: Retrieved context integrated into reasoning prompts
+- AC-099: Citations displayed for all retrieved information
+- AC-100: Knowledge base can be updated without system restart
+
+**Limitations:**
+- Still requires documents to be added to knowledge base
+- Cannot learn from real-time streaming data
+- Web search requires external API (optional feature)
+
+---
+
+### DEL-039: External API Integration Framework
+**Requirements:** NFR-015 (LLM extensibility)  
+**Priority:** Could Have  
+**Target Sprint:** 7 (Phase 3)  
+**Status:** Not Started  
+**Description:** Generic framework for integrating external APIs to provide real-time data access.
+
+**Components:**
+- **API Connector Registry:** Plugin system for API integrations
+- **Authentication Manager:** Secure API key storage and rotation
+- **Rate Limiting:** Respect API quotas and implement backoff
+- **Response Caching:** Cache API responses to reduce costs
+- **Error Handling:** Graceful degradation when APIs unavailable
+- **Tool Use Detection:** LLM determines when to call APIs
+
+**Example Integrations:**
+- Weather APIs (current conditions)
+- Financial APIs (stock prices, crypto)
+- Search APIs (web search, news)
+- Documentation APIs (GitHub, Stack Overflow)
+- Translation APIs
+- Code execution APIs
+
+**Acceptance Criteria:**
+- AC-101: Plugin system allows adding new API connectors
+- AC-102: Authentication securely manages API keys
+- AC-103: Rate limiting prevents quota exhaustion
+- AC-104: LLM can determine when to use APIs based on query
+- AC-105: At least 2 example API integrations implemented
+
+---
+
 ## Deliverables Summary
 
-**Total Deliverables:** 37  
+**Total Deliverables:** 39
 **Phase 1 (Sprints 1-3):** 24  
 **Phase 2 (Sprint 4-5):** 10  
-**Phase 3 (Sprint 6+):** 3
+**Phase 3 (Sprint 6-7):** 5
 
 ### By Priority
 - **Must Have:** 24 (DEL-030 moved to Should Have)
 - **Should Have:** 10 (includes DEL-026, DEL-030, DEL-032, DEL-033, DEL-036, DEL-037)
-- **Could Have:** 3 (DEL-027, DEL-028, DEL-029, DEL-031 - 4 total)
+- **Could Have:** 5 (DEL-027, DEL-028, DEL-029, DEL-031, DEL-038, DEL-039)
 
 ### By Sprint (Phase 1)
 - **Sprint 1:** DEL-001, DEL-002, DEL-009, DEL-011, DEL-013, DEL-014, DEL-015, DEL-017, DEL-018, DEL-019, DEL-020, DEL-025 (12 deliverables)
@@ -395,7 +477,10 @@
 ### By Sprint (Phase 2)
 - **Sprint 4:** DEL-012, DEL-021, DEL-024, DEL-030, DEL-032, DEL-034, DEL-035 (7 deliverables)
 - **Sprint 5:** DEL-026, DEL-031, DEL-033, DEL-036 (4 deliverables)
-- **Sprint 6 (Phase 3):** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
+
+### By Sprint (Phase 3)
+- **Sprint 6:** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
+- **Sprint 7:** DEL-038, DEL-039 (2 deliverables - RAG + external APIs for knowledge updates)
 
 ### By Category
 - **Core Reasoning:** DEL-002, DEL-003, DEL-008
