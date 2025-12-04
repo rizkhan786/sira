@@ -984,12 +984,94 @@ pattern = {
 
 ---
 
+### DEL-050: MATLAB Analytics Automation & Notifications
+**Requirements:** REQ-016 (MATLAB Integration), NFR-012 (Observability)  
+**Priority:** Should Have  
+**Target Sprint:** 6  
+**Status:** Not Started  
+**Description:** Automated daily execution of MATLAB analytics with scheduling, notifications, and intelligent triggering based on episode thresholds.
+
+**Components:**
+- Python scheduler for MATLAB execution
+- Multiple scheduling modes (daily, weekly, threshold-based)
+- Episode count tracking and intelligent triggering
+- Notification system (console, email, Slack)
+- Status monitoring and reporting
+- Windows Task Scheduler integration
+
+**Scheduling Modes:**
+1. **Daily:** Run every 24 hours
+2. **Weekly:** Run every 7 days
+3. **Threshold:** Run when 100+ new episodes accumulated
+4. **Manual:** On-demand execution
+
+**Features:**
+- Tracks last run time and episode count
+- Prevents redundant executions
+- Sends notifications on success/failure
+- Logs all executions to `logs/matlab_scheduler.log`
+- State persistence in `data/matlab/scheduler_state.json`
+
+**Usage Examples:**
+```bash
+# Check status
+python scripts/schedule_matlab_analytics.py --status
+
+# Run manually
+python scripts/schedule_matlab_analytics.py --run-now
+
+# Start daily daemon
+python scripts/schedule_matlab_analytics.py --mode daily --daemon
+
+# Threshold-based (run when 100+ new episodes)
+python scripts/schedule_matlab_analytics.py --mode threshold --daemon
+```
+
+**Acceptance Criteria:**
+- AC-156: Scheduler runs MATLAB analytics on configured schedule
+- AC-157: Tracks episode count and triggers at threshold (100+ episodes)
+- AC-158: Sends notifications on completion/failure
+- AC-159: Status command shows current state (last run, episode count)
+- AC-160: Integrates with Windows Task Scheduler for automatic startup
+
+**Files to Create:**
+- `scripts/schedule_matlab_analytics.py` - Main scheduler (✅ CREATED)
+- `scripts/setup_windows_task.ps1` - Windows Task Scheduler setup
+- `config/matlab_schedule.yaml` - Schedule configuration
+- `data/matlab/scheduler_state.json` - State persistence (auto-created)
+
+**Configuration (`config/matlab_schedule.yaml`):**
+```yaml
+matlab_scheduler:
+  mode: threshold  # daily | weekly | threshold
+  threshold_episodes: 100
+  check_interval_hours: 1
+  notifications:
+    console: true
+    email: false
+    slack: false
+  matlab_timeout_minutes: 10
+```
+
+**Notifications:**
+- ✅ Success: "MATLAB Analytics Complete - 250 episodes analyzed"
+- ❌ Failure: "MATLAB Analytics Failed - Error: [details]"
+- ⏰ Timeout: "MATLAB Analytics Timeout - Exceeded 10 minutes"
+
+**Future Enhancements (Not in Sprint 6):**
+- Email integration (SMTP)
+- Slack webhook notifications
+- Dashboard widget showing scheduler status
+- Multiple MATLAB scripts scheduling
+
+---
+
 ## Deliverables Summary
 
-**Total Deliverables:** 49
+**Total Deliverables:** 50
 **Phase 1 (Sprints 1-3):** 24  
 **Phase 2 (Sprint 4-5):** 14  
-**Phase 3 (Sprint 6-7):** 5  
+**Phase 3 (Sprint 6-7):** 6  
 **Phase 4 (Sprint 8-10):** 6 (Trading focus)
 
 ### By Priority
@@ -1007,7 +1089,7 @@ pattern = {
 - **Sprint 5:** DEL-026, DEL-031, DEL-033, DEL-036, DEL-040, DEL-041, DEL-042, DEL-043 (8 deliverables - benchmark validation focus)
 
 ### By Sprint (Phase 3)
-- **Sprint 6:** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
+- **Sprint 6:** DEL-027, DEL-028, DEL-029, DEL-037, DEL-050 (5 deliverables - community features + code generation + MATLAB automation)
 - **Sprint 7:** DEL-038, DEL-039 (2 deliverables - RAG + external APIs for knowledge updates)
 
 ### By Sprint (Phase 4 - Trading)
@@ -1022,7 +1104,7 @@ pattern = {
 - **Infrastructure:** DEL-009, DEL-013, DEL-014, DEL-015, DEL-017, DEL-018, DEL-019, DEL-020, DEL-025
 - **API/Interface:** DEL-001, DEL-011, DEL-012
 - **Observability:** DEL-010, DEL-017, DEL-034
-- **MATLAB Analytics:** DEL-016, DEL-030, DEL-031, DEL-032, DEL-033, DEL-036
+- **MATLAB Analytics:** DEL-016, DEL-030, DEL-031, DEL-032, DEL-033, DEL-036, DEL-050
 - **Metrics & Evaluation:** DEL-034, DEL-035, DEL-036
 - **Quality:** DEL-022, DEL-023
 - **Performance:** DEL-021, DEL-024
