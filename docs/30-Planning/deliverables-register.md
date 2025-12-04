@@ -633,93 +633,117 @@ GSM8K:
 
 ---
 
-### DEL-043: Automated Benchmark Reporting System
-**Requirements:** NFR-012 (Observability), NFR-013 (Metrics)  
+### DEL-043: Benchmark Comparison Output System
+**Requirements:** NFR-013 (Metrics)  
 **Priority:** Must Have  
 **Target Sprint:** 5  
 **Status:** Not Started  
-**Description:** Comprehensive automated report generation system that produces publication-quality reports comparing SIRA to industry baselines.
+**Description:** Simple comparison output system that shows SIRA performance vs major LLMs. Focus on actionable insights, not publication.
 
 **Components:**
-- **PDF Report Generator:** Professional reports with charts and tables
-- **HTML Dashboard:** Interactive web-based results viewer
-- **Markdown Export:** GitHub-friendly format
-- **Chart Generation:** Matplotlib/Seaborn visualizations
-- **Table Formatting:** LaTeX-quality tables
-- **Executive Summary:** Auto-generated key findings
-- **Methodology Section:** Reproducibility documentation
+- **Console Output:** Simple text-based comparison table
+- **JSON Export:** Machine-readable results
+- **Markdown Summary:** Quick README-style summary
+- **Basic Charts:** 2-3 simple comparison charts (optional)
 
-**Report Sections:**
+**Output Format:**
+```
+=== SIRA Benchmark Results ===
 
-**1. Executive Summary**
-- Overall performance summary
-- Key findings (3-5 bullet points)
-- Improvement over baseline
-- Recommendations
+MMLU: 57.2% (baseline: 55%, improvement: +2.2%)
+  - STEM: 52.1%
+  - Humanities: 61.3%
+  - Social Sciences: 58.4%
+  - Other: 57.9%
 
-**2. Benchmark Results**
-- MMLU: Overall score + per-subject breakdown
-- HumanEval: pass@1, pass@10 scores
-- GSM8K: Overall accuracy + difficulty analysis
+HumanEval (pass@1): 27.4% (baseline: 25%, improvement: +2.4%)
 
-**3. Comparative Analysis**
-- Leaderboard: SIRA ranked against competitors
-- Category comparison: STEM, Humanities, Social Sciences
-- Domain heat map: Visual comparison across subjects
-- Statistical significance: P-values and confidence intervals
+GSM8K: 62.1% (baseline: 58%, improvement: +4.1%)
 
-**4. Learning Analysis**
-- Learning curve: Performance over queries
-- Pattern effectiveness: With vs without patterns
-- Convergence analysis: When does improvement plateau?
-- Domain-specific learning: Which domains benefit most?
+=== Comparison to Major LLMs ===
+Model              MMLU    HumanEval  GSM8K
+--------------------------------------------------
+GPT-4              86.4%   67.0%      92.0%
+Claude 3 Opus      86.8%   84.9%      95.0%
+Gemini Ultra       90.0%   -          94.4%
+LLaMA 3 70B        82.0%   ~55%       93.0%
+LLaMA 3.2 3B       ~57%    ~25%       ~58%
+SIRA (this run)    57.2%   27.4%      62.1%  ← YOU ARE HERE
 
-**5. Strengths & Weaknesses**
-- Top 10 subjects: Where SIRA excels
-- Bottom 10 subjects: Areas for improvement
-- Comparison to similar-sized models
-- Recommendations for future work
+=== Key Findings ===
+✅ Pattern learning adds +2-4% across benchmarks
+✅ Best performance: GSM8K (+4.1% improvement)
+✅ Strengths: Math reasoning, arithmetic
+⚠️  Weaknesses: Knowledge-heavy subjects
 
-**6. Methodology**
-- Dataset details
-- Evaluation protocol
-- Hardware/software environment
-- Reproducibility instructions
+Top 5 MMLU Subjects:
+1. elementary_mathematics: 78.2%
+2. formal_logic: 72.1%
+3. high_school_mathematics: 69.4%
+4. abstract_algebra: 67.3%
+5. computer_science: 65.8%
 
-**7. Appendices**
-- Complete per-subject scores
-- Failed questions analysis
-- Raw data tables
-- Statistical test details
-
-**Visualizations Included:**
-1. Overall comparison bar chart (SIRA vs top models)
-2. Category radar chart (STEM, Humanities, etc.)
-3. Learning curve line graph
-4. Domain heat map (57 MMLU subjects)
-5. Score distribution histogram
-6. Confidence interval error bars
-7. Pattern effectiveness comparison
+Bottom 5 MMLU Subjects:
+1. world_religions: 41.2%
+2. prehistory: 43.8%
+3. professional_medicine: 44.1%
+4. jurisprudence: 45.3%
+5. sociology: 46.7%
+```
 
 **Acceptance Criteria:**
-- AC-121: PDF report generated with all 7 sections
-- AC-122: Report includes 7+ publication-quality visualizations
-- AC-123: HTML dashboard provides interactive exploration
-- AC-124: Executive summary auto-generated based on results
-- AC-125: Report can be regenerated anytime with updated data
+- AC-121: Console output displays comparison table
+- AC-122: JSON export with all results and metadata
+- AC-123: Markdown summary generated for README
+- AC-124: Identifies top 5 strengths and bottom 5 weaknesses
+- AC-125: Shows statistical significance (p-value) for improvements
 
 **Files to Create:**
-- `src/benchmarks/reports/__init__.py`
-- `src/benchmarks/reports/pdf_generator.py` - PDF creation
-- `src/benchmarks/reports/html_dashboard.py` - Web dashboard
-- `src/benchmarks/reports/visualizations.py` - Chart generation
-- `src/benchmarks/reports/templates/` - Report templates
-- `scripts/generate_report.py` - CLI interface
+- `src/benchmarks/output.py` - Simple output formatter
+- `scripts/show_results.py` - CLI to display results
 
-**Output Examples:**
-- `reports/sira_benchmark_report_2025-12-03.pdf`
-- `reports/sira_benchmark_dashboard.html`
-- `reports/sira_benchmark_summary.md`
+**Output Files:**
+- `results/benchmark_results.json`
+- `results/benchmark_summary.md`
+- Console output only (no PDF)
+
+---
+
+### DEL-044: Publication-Quality Benchmark Report
+**Requirements:** NFR-012 (Observability)  
+**Priority:** Could Have  
+**Target Sprint:** 8 (Enhancement)  
+**Status:** Not Started  
+**Description:** Full 30-50 page publication-quality report with comprehensive analysis, visualizations, and methodology. Only build this once SIRA shows strong results.
+
+**Deferred Until:** SIRA demonstrates clear superiority in specific domains (e.g., +10% in math/coding)
+
+**Components:**
+- PDF report generator with LaTeX-quality formatting
+- Interactive HTML dashboard
+- 10+ publication-quality visualizations
+- Executive summary auto-generation
+- Full methodology section for reproducibility
+- Statistical appendices
+
+**Report Sections:**
+1. Executive Summary
+2. Detailed Benchmark Results
+3. Comparative Analysis vs All Major LLMs
+4. Learning Curve Analysis
+5. Domain-Specific Deep Dive
+6. Pattern Learning Effectiveness Study
+7. Methodology & Reproducibility
+8. Appendices (raw data, statistical tests)
+
+**Acceptance Criteria:**
+- AC-126: PDF report with 8 sections, 30-50 pages
+- AC-127: 10+ publication-quality visualizations
+- AC-128: Interactive HTML dashboard
+- AC-129: Ready for academic submission
+- AC-130: Includes all statistical test details
+
+**Note:** Only implement when SIRA results are publication-worthy
 
 ---
 

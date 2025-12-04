@@ -119,38 +119,53 @@ GSM8K: Claude 3 Opus (95%), GPT-4 (92%), LLaMA 3.2 3B (50-60%)
 
 ---
 
-#### DEL-043: Automated Benchmark Reporting System
+#### DEL-043: Benchmark Comparison Output System
 **Priority:** Must Have  
-**Estimated Effort:** 3 days  
+**Estimated Effort:** 1 day  
 **Dependencies:** DEL-042 (needs analysis)
 
 **Scope:**
-- PDF report generation (publication quality)
-- HTML interactive dashboard
-- Markdown export
-- 7+ visualizations (bar charts, heat maps, learning curves)
-- Executive summary auto-generation
+- Simple console output with comparison table
+- JSON export (machine-readable)
+- Markdown summary (README-style)
+- Basic charts (optional)
+- Focus: actionable insights, not publication
 
-**Report Sections:**
-1. Executive Summary (auto-generated)
-2. Benchmark Results (MMLU, HumanEval, GSM8K)
-3. Comparative Analysis (vs GPT-4, Claude, etc.)
-4. Learning Analysis (pattern effectiveness)
-5. Strengths & Weaknesses (domain analysis)
-6. Methodology (reproducibility)
-7. Appendices (raw data, failed questions)
+**Output Format:**
+```
+=== SIRA Benchmark Results ===
+MMLU: 57.2% (baseline: 55%, +2.2%)
+HumanEval: 27.4% (baseline: 25%, +2.4%)
+GSM8K: 62.1% (baseline: 58%, +4.1%)
+
+=== Comparison Table ===
+Model          MMLU    HumanEval  GSM8K
+GPT-4          86.4%   67.0%      92.0%
+LLaMA 3.2 3B   ~57%    ~25%       ~58%
+SIRA           57.2%   27.4%      62.1% ← YOU
+
+=== Key Findings ===
+✅ +2-4% improvement from pattern learning
+✅ Best: GSM8K (+4.1%)
+⚠️  Weak: Knowledge-heavy subjects
+
+Top 5 MMLU: [list]
+Bottom 5 MMLU: [list]
+```
 
 **Acceptance Criteria:**
-- AC-121: PDF report with all 7 sections
-- AC-122: 7+ publication-quality visualizations
-- AC-123: HTML dashboard for interactive exploration
-- AC-124: Executive summary auto-generated
-- AC-125: Report regeneratable anytime
+- AC-121: Console output displays comparison table
+- AC-122: JSON export with all results and metadata
+- AC-123: Markdown summary generated for README
+- AC-124: Identifies top 5 strengths and bottom 5 weaknesses
+- AC-125: Shows statistical significance (p-value)
 
 **Output:**
-- `reports/sira_benchmark_report_2025-12-25.pdf`
-- `reports/sira_benchmark_dashboard.html`
-- `reports/sira_benchmark_summary.md`
+- `results/benchmark_results.json`
+- `results/benchmark_summary.md`
+- Console output only (no PDF)
+
+**Note:** Full 30-50 page publication report moved to DEL-044 (Sprint 8) once SIRA excels
 
 ---
 
@@ -236,10 +251,10 @@ GSM8K: Claude 3 Opus (95%), GPT-4 (92%), LLaMA 3.2 3B (50-60%)
 
 **Total Deliverables:** 8 (4 Must Have benchmarks + 4 supporting)  
 **Total Acceptance Criteria:** 29  
-**Estimated Effort:** 17 days (exceeds 14-day sprint)
+**Estimated Effort:** 15 days (slightly over 14-day sprint)
 
 ### Priority Breakdown
-- **Must Have (Benchmarks):** 4 deliverables (DEL-040, 041, 042, 043) - 11 days
+- **Must Have (Benchmarks):** 4 deliverables (DEL-040, 041, 042, 043) - 9 days
 - **Should Have:** 2 deliverables (DEL-026, DEL-036) - 4 days
 - **Could Have:** 2 deliverables (DEL-033, DEL-031) - 5 days
 
@@ -252,10 +267,11 @@ GSM8K: Claude 3 Opus (95%), GPT-4 (92%), LLaMA 3.2 3B (50-60%)
 - **Day 5:** Continue MMLU (Social Sciences subjects)
 - **Weekend:** Complete MMLU (Other subjects) - leave running
 
-**Week 2: Analysis & Reporting**
+**Week 2: Analysis & Simple Reporting**
 - **Day 8-10:** DEL-042 - Comparison & analysis system
-- **Day 11-13:** DEL-043 - Report generation system
-- **Day 14:** Generate final reports, Sprint completion
+- **Day 11:** DEL-043 - Simple comparison output (console/JSON/markdown)
+- **Day 12-13:** DEL-026 or DEL-036 (if time permits)
+- **Day 14:** Final results review, Sprint completion
 
 **If time permits:**
 - DEL-026, DEL-036 (pattern export, MATLAB integration)
@@ -360,16 +376,17 @@ Day 14 (Dec 24): Sprint Completion
 4. ✅ All results validated and stored
 5. ✅ Comparison to 10+ major LLMs completed
 6. ✅ Statistical analysis performed
-7. ✅ PDF report generated with 7 sections
-8. ✅ HTML dashboard created
-9. ✅ Pattern learning improvement demonstrated
-10. ✅ Domain strengths/weaknesses identified
+7. ✅ Console comparison output generated
+8. ✅ JSON export with all results
+9. ✅ Markdown summary created
+10. ✅ Pattern learning improvement demonstrated
+11. ✅ Top 5 strengths / bottom 5 weaknesses identified
 
 ### Quality Gates
 - All benchmarks complete without major errors (>95% completion rate)
 - Automated scoring matches manual validation (>95% agreement)
 - Statistical tests show significance (p < 0.05 for key claims)
-- Report is publication-quality (professional formatting, clear visualizations)
+- Comparison output is clear and actionable
 - Results are reproducible (methodology documented)
 
 ---
@@ -385,7 +402,14 @@ Day 14 (Dec 24): Sprint Completion
 - Raw data in database
 - JSON exports for reproducibility
 
-**2. Analysis:**
+**2. Comparison Output:**
+- Console output with comparison table
+- JSON export: `results/benchmark_results.json`
+- Markdown summary: `results/benchmark_summary.md`
+- Statistical significance (p-values)
+- Top 5 strengths / bottom 5 weaknesses
+
+**3. Analysis:**
 - Statistical comparison to 10+ LLMs
 - Learning curves showing improvement
 - Domain heat map (57 MMLU subjects)
