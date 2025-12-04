@@ -747,12 +747,250 @@ Bottom 5 MMLU Subjects:
 
 ---
 
+### DEL-045: Trading Data Ingestion Pipeline
+**Requirements:** NFR-005 (Data Persistence)  
+**Priority:** Should Have  
+**Target Sprint:** 8  
+**Status:** Not Started  
+**Description:** Parse CSV OHLC data, calculate technical indicators, store in time-series database. Supports gold (XAUUSD.FXCM) initially, expandable to forex, futures.
+
+**Components:**
+- CSV parser for OHLC data (Open, High, Low, Close)
+- Technical indicator calculator (15+ indicators)
+- Multi-timeframe support (daily, weekly, 4-hourly)
+- Time-series database storage (PostgreSQL with TimescaleDB)
+- Data validation and missing data handling
+
+**CSV Format Expected:**
+```csv
+date,open,high,low,close
+2020-01-02,1520.50,1535.20,1518.00,1532.75
+2020-01-03,1532.75,1540.10,1525.30,1538.20
+```
+
+**Technical Indicators:**
+- Trend: 20/50/200 SMA, EMA
+- Momentum: RSI(14), Stochastic, MACD
+- Volatility: Bollinger Bands, ATR
+- Volume: OBV (if volume available)
+- Price Action: Higher highs/lows, support/resistance
+
+**Acceptance Criteria:**
+- AC-131: Ingests CSV OHLC data for multiple instruments
+- AC-132: Calculates 15+ technical indicators
+- AC-133: Handles daily, weekly, 4-hourly timeframes
+- AC-134: Detects and handles missing data, gaps
+- AC-135: Stores in time-series optimized format
+
+**Files to Create:**
+- `src/trading/data_ingestion.py`
+- `src/trading/indicators.py`
+- `scripts/ingest_market_data.py`
+- `data/trading/` - Directory for CSV files
+
+---
+
+### DEL-046: Trading Backtesting Engine
+**Requirements:** NFR-009 (Testing), NFR-013 (Metrics)  
+**Priority:** Must Have  
+**Target Sprint:** 8  
+**Status:** Not Started  
+**Description:** Historical simulation engine with strict no-lookahead policy, walk-forward testing, transaction costs, and comprehensive performance metrics.
+
+**Components:**
+- Historical simulation with no-lookahead enforcement
+- Walk-forward testing (expanding/rolling windows)
+- Transaction cost modeling (commissions, slippage)
+- Position sizing and risk management
+- Performance metrics (Sharpe, Sortino, max drawdown, CAGR)
+
+**Critical: No-Lookahead Prevention:**
+```python
+# All features must be shifted by 1 period
+# Signal generated today uses only yesterday's data
+signal = get_signal(df['close'].shift(1))
+```
+
+**Walk-Forward Testing:**
+- Train: 2000-2010 → Test: 2011-2012
+- Train: 2000-2012 → Test: 2013-2014
+- Continue expanding training window
+
+**Acceptance Criteria:**
+- AC-136: Strict no-lookahead enforcement (all features shifted)
+- AC-137: Walk-forward testing with expanding windows
+- AC-138: Models transaction costs (0.1% commission + 0.05% slippage)
+- AC-139: Tracks 15+ performance metrics
+- AC-140: Generates equity curve, drawdown chart, trade log
+
+**Files to Create:**
+- `src/trading/backtesting.py`
+- `src/trading/portfolio.py`
+- `src/trading/metrics.py`
+- `tests/test_no_lookahead.py` ⚠️ CRITICAL
+
+---
+
+### DEL-047: SIRA Trading Strategy Reasoning
+**Requirements:** REQ-002 (Reasoning), REQ-007 (Pattern Application)  
+**Priority:** Must Have  
+**Target Sprint:** 9  
+**Status:** Not Started  
+**Description:** SIRA generates buy/sell/hold signals using multi-factor reasoning, pattern library retrieval, confidence scoring, and risk management.
+
+**Components:**
+- Feature vector construction (technical + macro context)
+- SIRA multi-factor reasoning (combines 5+ factors)
+- Pattern library integration
+- Confidence scoring (0-100%)
+- Risk management (position sizing, stop-loss, take-profit)
+
+**How It Works:**
+1. Construct feature vector (RSI, MACD, BB position, trend, etc.)
+2. SIRA analyzes context and generates reasoning
+3. Retrieve similar patterns from library
+4. Generate signal with confidence score
+5. Provide stop-loss and take-profit levels
+
+**Example Output:**
+```
+SELL SIGNAL (Confidence: 75%)
+
+Reasoning:
+- RSI 72.3 (overbought)
+- MACD bearish crossover
+- Price at upper BB (95th percentile)
+- Pattern #142: 78% win rate
+
+Action: SELL, Stop: $1,548, Target: $1,490
+Risk/Reward: 2.8:1
+```
+
+**Acceptance Criteria:**
+- AC-141: Generates signals with multi-factor reasoning
+- AC-142: Assigns confidence scores based on pattern library
+- AC-143: Suggests position size based on volatility (ATR)
+- AC-144: Provides stop-loss and take-profit levels
+- AC-145: Stores trade outcomes for pattern learning
+
+**Files to Create:**
+- `src/trading/strategy.py`
+- `src/trading/signals.py`
+- `src/trading/risk_management.py`
+
+---
+
+### DEL-048: Trading Pattern Learning System
+**Requirements:** REQ-004 (Pattern Extraction), REQ-005 (Pattern Storage)  
+**Priority:** Must Have  
+**Target Sprint:** 9  
+**Status:** Not Started  
+**Description:** Automatically extracts patterns from profitable trades, stores in ChromaDB, tracks success rates, detects market regimes.
+
+**Components:**
+- Pattern extraction from trades (setup → outcome)
+- Storage in ChromaDB (semantic search for similar setups)
+- Performance tracking (win rate, Sharpe, avg return)
+- Market regime detection (bull/bear/sideways, high/low volatility)
+- Pattern confidence updating based on recent performance
+
+**Pattern Schema:**
+```python
+pattern = {
+    'id': 'PATTERN-142',
+    'conditions': {
+        'rsi_14': {'operator': '>', 'value': 70},
+        'macd_histogram': {'operator': '<', 'value': 0},
+        'bb_position': {'operator': '>', 'value': 0.85}
+    },
+    'signal': 'SELL',
+    'performance': {
+        'occurrences': 45,
+        'wins': 35,
+        'win_rate': 0.778,
+        'avg_return': 0.025,
+        'sharpe_ratio': 1.8
+    },
+    'regime': 'mean_reverting'
+}
+```
+
+**Acceptance Criteria:**
+- AC-146: Automatically extracts patterns from trades
+- AC-147: Tracks pattern success rate (rolling 90 days)
+- AC-148: Detects market regime changes
+- AC-149: Retrieves similar patterns using semantic search
+- AC-150: Updates pattern confidence based on recent performance
+
+**Files to Create:**
+- `src/trading/patterns.py`
+- `src/trading/regime_detection.py`
+
+---
+
+### DEL-049: Multi-Instrument Trading Backtest Suite
+**Requirements:** NFR-009 (Testing), NFR-013 (Metrics)  
+**Priority:** Must Have  
+**Target Sprint:** 10  
+**Status:** Not Started  
+**Description:** Comprehensive backtesting across multiple instruments, timeframes, and 20 years of data. Compare SIRA to baseline strategies (buy-and-hold, SMA crossover, RSI).
+
+**Components:**
+- Multi-instrument runner (gold initially, expandable)
+- Walk-forward testing across 20 years (2000-2023)
+- Baseline strategy comparison (5 strategies)
+- Comprehensive performance reporting
+- Equity curve and drawdown visualization
+
+**Instruments (Start with Gold):**
+1. **Commodities:** Gold (XAUUSD.FXCM)
+2. **Future:** Silver, Oil, forex pairs
+
+**Baseline Strategies:**
+1. Buy-and-Hold (benchmark)
+2. SMA Crossover (50/200 Golden/Death Cross)
+3. RSI(14) (Buy < 30, Sell > 70)
+4. MACD (Signal line crossover)
+5. SIRA (with pattern learning)
+
+**Walk-Forward Plan:**
+- Training: 2000-2009 → Test: 2010-2011
+- Training: 2000-2011 → Test: 2012-2013
+- Continue through 2023
+
+**Performance Metrics:**
+- Return: CAGR, total return
+- Risk: Max drawdown, volatility
+- Risk-Adjusted: Sharpe, Sortino, Calmar
+- Trade Stats: Win rate, profit factor, avg win/loss
+
+**Success Criteria:**
+- SIRA beats buy-and-hold by 3%+ annually
+- Sharpe ratio > 1.5
+- Max drawdown < 20%
+- Win rate > 55%
+
+**Acceptance Criteria:**
+- AC-151: Tests on 5+ instruments across 20 years
+- AC-152: Walk-forward testing with 5+ validation periods
+- AC-153: Compares to 4+ baseline strategies
+- AC-154: Calculates 15+ performance metrics
+- AC-155: Generates comprehensive report with equity curves
+
+**Files to Create:**
+- `src/trading/backtest_runner.py`
+- `src/trading/baseline_strategies.py`
+- `scripts/run_comprehensive_backtest.py`
+
+---
+
 ## Deliverables Summary
 
-**Total Deliverables:** 43
+**Total Deliverables:** 49
 **Phase 1 (Sprints 1-3):** 24  
 **Phase 2 (Sprint 4-5):** 14  
-**Phase 3 (Sprint 6-7):** 5
+**Phase 3 (Sprint 6-7):** 5  
+**Phase 4 (Sprint 8-10):** 6 (Trading focus)
 
 ### By Priority
 - **Must Have:** 28 (includes DEL-040, DEL-041, DEL-042, DEL-043)
@@ -772,6 +1010,11 @@ Bottom 5 MMLU Subjects:
 - **Sprint 6:** DEL-027, DEL-028, DEL-029, DEL-037 (4 deliverables - community features + code generation)
 - **Sprint 7:** DEL-038, DEL-039 (2 deliverables - RAG + external APIs for knowledge updates)
 
+### By Sprint (Phase 4 - Trading)
+- **Sprint 8:** DEL-044, DEL-045, DEL-046 (3 deliverables - data ingestion + backtesting foundation)
+- **Sprint 9:** DEL-047, DEL-048 (2 deliverables - trading strategy + pattern learning)
+- **Sprint 10:** DEL-049 (1 deliverable - comprehensive multi-instrument backtesting)
+
 ### By Category
 - **Core Reasoning:** DEL-002, DEL-003, DEL-008
 - **Pattern Learning:** DEL-004, DEL-005, DEL-006, DEL-007
@@ -784,8 +1027,9 @@ Bottom 5 MMLU Subjects:
 - **Quality:** DEL-022, DEL-023
 - **Performance:** DEL-021, DEL-024
 - **Code Generation:** DEL-037
-- **Benchmarks & Validation:** DEL-040, DEL-041, DEL-042, DEL-043
+- **Benchmarks & Validation:** DEL-040, DEL-041, DEL-042, DEL-043, DEL-044
 - **Knowledge Enhancement:** DEL-038, DEL-039
+- **Trading & Financial Markets:** DEL-045, DEL-046, DEL-047, DEL-048, DEL-049
 
 ### By Status
 - **Not Started:** 36
