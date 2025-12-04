@@ -11,8 +11,10 @@ from src.patterns.usage_tracker import PatternUsageTracker
 from src.reasoning.refinement import RefinementLoop, RefinementConfig
 from src.matlab.config_reader import ConfigReader
 from src.core.logging import get_logger
+from src.core.config import get_settings
 
 logger = get_logger(__name__)
+settings = get_settings()
 
 
 class ReasoningEngine:
@@ -72,13 +74,16 @@ class ReasoningEngine:
         start_time = datetime.now(timezone.utc)
         
         try:
-            # Retrieve similar patterns before reasoning
-            retrieved_patterns = await self.pattern_retriever.retrieve_patterns(
-                query=query,
-                n_results=3,
-                min_quality=0.7,
-                min_similarity=0.2  # Lowered from 0.5 to 0.2 for better matching
-            )
+            # Fast mode: skip pattern retrieval for speed
+            retrieved_patterns = []
+            if not settings.fast_mode:
+                # Retrieve similar patterns before reasoning
+                retrieved_patterns = await self.pattern_retriever.retrieve_patterns(
+                    query=query,
+                    n_results=3,
+                    min_quality=0.7,
+                    min_similarity=0.2  # Lowered from 0.5 to 0.2 for better matching
+                )
             
             # Format patterns for prompt using new formatter
             pattern_metadata = []
@@ -116,7 +121,8 @@ class ReasoningEngine:
             
             # Iterative refinement if quality below threshold
             refinement_result = None
-            if self.refinement_loop.should_refine(initial_quality):
+            # Fast mode: skip refinement iterations
+            if not settings.fast_mode and self.refinement_loop.should_refine(initial_quality):
                 logger.info(
                     "starting_refinement",
                     initial_quality=initial_quality,
@@ -283,6 +289,17 @@ class ReasoningEngine:
 Query: {query}
 """
         
+        # Include extracted preferences FIRST (rule-based, explicit)
+        if context and context.get("preference_prompt"):
+            prompt += f"\n{context['preference_prompt']}"
+        
+        # Include full conversation history for additional context
+        if context and context.get("conversation_history"):
+            prompt += f"""\n=== Previous Conversation (for reference) ===
+{context['conversation_history']}
+============================================
+"""
+        
         # Add pattern guidance if available
         if context and context.get('pattern_guidance'):
             prompt += f"\n\n{context['pattern_guidance']}\n"
@@ -294,9 +311,6 @@ Query: {query}
 
 Each step should be a single, clear thought or action needed to answer the query.
 """
-        
-        if context and context.get("history"):
-            prompt += f"\n\nPrevious context: {context['history'][:200]}"
             
         return prompt
     
@@ -318,12 +332,23 @@ Query: {query}
 
 Reasoning Steps:
 {steps_text}
-
-Provide a direct answer that incorporates the reasoning above. Be specific and helpful.
 """
         
-        if context and context.get("history"):
-            prompt += f"\n\nPrevious context: {context['history'][:200]}"
+        # Include extracted preferences FIRST (rule-based, explicit)
+        if context and context.get("preference_prompt"):
+            prompt += f"\n{context['preference_prompt']}"
+        
+        # Include full conversation history for additional context
+        if context and context.get("conversation_history"):
+            prompt += f"""\n=== Previous Conversation (for reference) ===
+{context['conversation_history']}
+============================================
+
+IMPORTANT: When providing your answer, strictly follow the USER PREFERENCES above.
+If multiple preferences are listed, your answer MUST combine ALL of them.
+"""
+        else:
+            prompt += "\n\nProvide a direct answer that incorporates the reasoning above. Be specific and helpful.\n"
             
         return prompt
     

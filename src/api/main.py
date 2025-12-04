@@ -21,6 +21,7 @@ from src.metrics.advanced_metrics import AdvancedMetrics
 from src.api import metrics as metrics_api
 from src.matlab.episode_logger import EpisodeLogger
 from src.matlab.config_reader import ConfigReader
+from src.reasoning.preference_tracker import PreferenceTracker
 
 logger = get_logger(__name__)
 
@@ -102,7 +103,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup."""
-    global reasoning_engine, repository, metrics_collector, metrics_storage, core_metrics, advanced_metrics, episode_logger, config_reader
+    global reasoning_engine, repository, metrics_collector, metrics_storage, core_metrics, advanced_metrics, episode_logger, config_reader, preference_tracker
     logger.info("Starting SIRA API", env=settings.env, port=settings.api_port)
     
     # Initialize MATLAB integration first (needed by reasoning engine)
@@ -133,6 +134,9 @@ async def startup_event():
         batch_size=10,
         export_interval_seconds=3600
     )
+    
+    # Initialize preference tracker
+    preference_tracker = PreferenceTracker()
     
     logger.info("SIRA API startup complete")
 
@@ -193,13 +197,44 @@ async def process_query(request: QueryRequest):
                 )
             session_id = request.session_id
             await repository.update_session_activity(session_id)
+            
+            # Retrieve conversation history for context
+            history = await repository.get_session_queries(session_id, limit=10)
+            logger.info("conversation_history_retrieved", session_id=session_id, history_count=len(history))
         else:
             session_id = await repository.create_session()
+            history = []
+        
+        # Build context with conversation history
+        context = request.context or {}
+        if history:
+            # Reverse history so oldest messages come first (chronological order)
+            history = list(reversed(history))
+            # Format history as conversation: Q&A pairs
+            history_text = "\n\n".join([
+                f"User: {h['query_text']}\nSIRA: {h['response_text']}"
+                for h in history
+            ])
+            context["conversation_history"] = history_text
+            
+            # Extract preferences using rule-based tracker
+            preferences_data = preference_tracker.extract_preferences(history)
+            if preferences_data["combined_context"]:
+                context["preferences"] = preferences_data
+                preference_prompt = preference_tracker.build_context_prompt(preferences_data)
+                context["preference_prompt"] = preference_prompt
+                logger.info(
+                    "preferences_tracked",
+                    preferences=preferences_data["preferences"],
+                    has_multiple=preferences_data["has_multiple_preferences"]
+                )
+            
+            logger.info("conversation_context_added", history_length=len(history_text))
         
         result = await reasoning_engine.process_query(
             query=request.query,
             session_id=session_id,
-            context=request.context
+            context=context
         )
         
         query_id = await repository.save_query(
