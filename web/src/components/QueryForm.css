@@ -1,0 +1,83 @@
+.query-form-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.query-form-container h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.query-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.query-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.query-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.query-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.submit-button {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.slow-warning {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.progress-info {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  border-radius: 4px;
+}
+
+.progress-info p {
+  margin: 4px 0;
+  color: #1976D2;
+  font-size: 14px;
+}
+
+.progress-details {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}

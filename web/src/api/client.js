@@ -10,7 +10,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 60000, // 60s timeout for reasoning queries
+  timeout: 300000, // 5 minute timeout for complex reasoning queries
 });
 
 /**
@@ -20,11 +20,32 @@ const apiClient = axios.create({
  * @returns {Promise} Response with reasoning result
  */
 export const submitQuery = async (query, sessionId = null) => {
-  const response = await apiClient.post('/query', {
-    query,
-    session_id: sessionId,
-  });
-  return response.data;
+  try {
+    const response = await apiClient.post('/query', {
+      query,
+      session_id: sessionId,
+    });
+    return response.data;
+  } catch (error) {
+    // Enhanced error handling
+    if (error.code === 'ECONNABORTED') {
+      throw new Error(
+        'Request timeout (5 minutes). This query is taking too long. Try a simpler query or check if SIRA is running.'
+      );
+    } else if (error.response) {
+      // Server responded with error
+      const serverMessage = error.response.data?.error || error.response.data?.detail || 'Server error';
+      throw new Error(`Server error: ${serverMessage}`);
+    } else if (error.request) {
+      // Request made but no response
+      throw new Error(
+        'No response from server. Is SIRA API running on http://localhost:8080?'
+      );
+    } else {
+      // Something else happened
+      throw new Error(`Request failed: ${error.message}`);
+    }
+  }
 };
 
 /**

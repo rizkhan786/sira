@@ -35,7 +35,7 @@ class LocalRuntimeClient(LLMClient):
         self.settings = get_settings()
         self.base_url = self.settings.llm_base_url
         self.model = self.settings.llm_model_general
-        self.timeout = 120.0  # 2 minutes for long generations
+        self.timeout = 300.0  # 5 minutes for complex reasoning queries
         
     async def generate(
         self,
