@@ -294,6 +294,13 @@ This becomes the **baseline** that SIRA must beat in Sprint 9-10.
 9. ✅ First backtest completed (buy-and-hold baseline)
 10. ✅ Walk-forward testing framework ready
 
+### Trading Strategy Success Criteria (Sprint 9-10):
+- ✅ SIRA beats buy-and-hold by 3%+ annually
+- ✅ Sharpe ratio > 1.5
+- ✅ Max drawdown < 20%
+- ✅ **Win rate > 75%** (high precision required)
+- ✅ Profit factor > 2.0
+
 ### Quality Gates
 - All unit tests pass (especially `test_no_lookahead.py`)
 - Indicators match reference implementations (TA-Lib or pandas-ta)

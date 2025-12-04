@@ -350,8 +350,16 @@ Final Test: 2020-2023 (3 years) → Out-of-sample validation
 - SIRA beats buy-and-hold by 3%+ annually (CAGR)
 - Sharpe ratio > 1.5 (preferably > 2.0)
 - Max drawdown < 20%
-- Win rate > 55%
-- Profit factor > 1.5
+- **Win rate > 75%** (high precision - fewer but higher quality trades)
+- Profit factor > 2.0
+
+**Note on 75% Win Rate:**
+Achieving 75% win rate requires:
+- High selectivity (only trade when confidence > 70%)
+- Strong pattern library validation (50+ occurrences minimum)
+- Tight stop-losses (accept small losses quickly)
+- Let winners run (avg win should be 2-3x avg loss)
+- Avoid choppy/sideways markets (wait for clear setups)
 
 **Acceptance Criteria:**
 - AC-151: Tests on 5+ instruments across 20 years
@@ -492,13 +500,14 @@ Risk-Adjusted:
 - Buy-and-Hold Max Drawdown: -18.7%
 
 Trade Statistics:
-- Total Trades: 42
-- Win Rate: 61.9% (26 wins, 16 losses)
-- Avg Win: +3.2%
-- Avg Loss: -1.8%
-- Profit Factor: 1.94
+- Total Trades: 28 (highly selective)
+- Win Rate: 78.6% (22 wins, 6 losses)
+- Avg Win: +3.8%
+- Avg Loss: -1.2%
+- Profit Factor: 2.35
 - Best Trade: +8.7% (March 2020 - COVID panic)
-- Worst Trade: -4.2% (Nov 2022 - USD strength)
+- Worst Trade: -1.5% (tight stop-loss)
+- Trade Frequency: ~7 trades/year (quality over quantity)
 
 Pattern Learning:
 - Started with 287 patterns (from training)

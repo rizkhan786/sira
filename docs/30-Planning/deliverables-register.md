@@ -968,7 +968,7 @@ pattern = {
 - SIRA beats buy-and-hold by 3%+ annually
 - Sharpe ratio > 1.5
 - Max drawdown < 20%
-- Win rate > 55%
+- Win rate > 75%
 
 **Acceptance Criteria:**
 - AC-151: Tests on 5+ instruments across 20 years

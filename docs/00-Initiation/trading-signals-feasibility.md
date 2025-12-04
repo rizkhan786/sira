@@ -271,7 +271,7 @@ Reasoning:
 - SIRA beats buy-and-hold by 5%+ annually
 - SIRA achieves Sharpe ratio > 1.5
 - Max drawdown < 20%
-- Win rate > 55%
+- Win rate > 75%
 
 ---
 
