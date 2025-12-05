@@ -96,8 +96,15 @@ fprintf('========================================\n\n');
 
 fprintf('Learning Performance:\n');
 fprintf('  Learning Velocity: %.6f quality/hour\n', velocity);
-fprintf('  R² (fit quality): %.4f\n', velocity_stats.r_squared);
-fprintf('  Improvement: %.2f%%\n\n', velocity_stats.improvement_pct);
+if isfield(velocity_stats, 'r_squared')
+    fprintf('  R² (fit quality): %.4f\n', velocity_stats.r_squared);
+end
+if isfield(velocity_stats, 'improvement_pct')
+    fprintf('  Improvement: %.2f%%\n', velocity_stats.improvement_pct);
+else
+    fprintf('  Insufficient data for regression analysis\n');
+end
+fprintf('\n');
 
 fprintf('Pattern Effectiveness:\n');
 fprintf('  Domains analyzed: %d\n', length(effectiveness.by_domain));
@@ -141,7 +148,18 @@ annotation('textbox', [0.1, 0.75, 0.8, 0.08], ...
            'HorizontalAlignment', 'center', ...
            'EdgeColor', 'none');
 
-% Key Metrics
+% Key Metrics - use safe field access
+if isfield(velocity_stats, 'num_episodes')
+    num_eps = velocity_stats.num_episodes;
+else
+    num_eps = length(episodes);
+end
+
+if isfield(velocity_stats, 'slope'), slope_val = velocity_stats.slope; else, slope_val = 0; end
+if isfield(velocity_stats, 'r_squared'), r_sq = velocity_stats.r_squared; else, r_sq = 0; end
+if isfield(velocity_stats, 'improvement_pct'), imp_pct = velocity_stats.improvement_pct; else, imp_pct = 0; end
+if isfield(velocity_stats, 'avg_quality_overall'), avg_qual = velocity_stats.avg_quality_overall; else, avg_qual = 0; end
+
 metrics_text = sprintf(['KEY METRICS\n\n' ...
                         'Episodes Analyzed: %d\n' ...
                         'Learning Velocity: %.6f quality/hour\n' ...
@@ -150,11 +168,7 @@ metrics_text = sprintf(['KEY METRICS\n\n' ...
                         'Avg Quality: %.4f\n\n' ...
                         'Domains: %d\n' ...
                         'Pattern Types: %d'], ...
-                       velocity_stats.num_episodes, ...
-                       velocity_stats.slope, ...
-                       velocity_stats.r_squared, ...
-                       velocity_stats.improvement_pct, ...
-                       velocity_stats.avg_quality_overall, ...
+                       num_eps, slope_val, r_sq, imp_pct, avg_qual, ...
                        length(effectiveness.by_domain), ...
                        length(effectiveness.by_pattern));
 
@@ -194,17 +208,21 @@ function generate_recommendations(velocity_stats, effectiveness)
 recommendations = {};
 
 % Learning velocity recommendations
-if velocity_stats.slope > 0.001
-    recommendations{end+1} = '✓ Strong learning trend detected. Continue current pattern refinement approach.';
-elseif velocity_stats.slope > 0
-    recommendations{end+1} = '⚠ Weak learning trend. Consider increasing pattern diversity or refinement frequency.';
+if isfield(velocity_stats, 'slope')
+    if velocity_stats.slope > 0.001
+        recommendations{end+1} = '✓ Strong learning trend detected. Continue current pattern refinement approach.';
+    elseif velocity_stats.slope > 0
+        recommendations{end+1} = '⚠ Weak learning trend. Consider increasing pattern diversity or refinement frequency.';
+    else
+        recommendations{end+1} = '✗ No learning improvement. Review pattern extraction and quality scoring logic.';
+    end
+    
+    % R² recommendations
+    if isfield(velocity_stats, 'r_squared') && velocity_stats.r_squared < 0.5
+        recommendations{end+1} = '⚠ Low R² suggests inconsistent quality. Investigate outliers or quality scoring issues.';
+    end
 else
-    recommendations{end+1} = '✗ No learning improvement. Review pattern extraction and quality scoring logic.';
-end
-
-% R² recommendations
-if velocity_stats.r_squared < 0.5
-    recommendations{end+1} = '⚠ Low R² suggests inconsistent quality. Investigate outliers or quality scoring issues.';
+    recommendations{end+1} = '⚠ Insufficient data for learning velocity analysis. Continue collecting episodes.';
 end
 
 % Domain coverage

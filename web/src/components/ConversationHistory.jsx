@@ -21,9 +21,9 @@ export default function ConversationHistory({ history, onClear, sessionId }) {
     return (
       <div className="conversation-history empty">
         <div className="empty-state">
-          <h3>💬 Start a Conversation</h3>
-          <p>Ask SIRA a question to begin.</p>
-          <p className="tip">SIRA will remember the context of your conversation!</p>
+          <div className="empty-icon">💬</div>
+          <h3>How can I help you today?</h3>
+          <p>Start by asking a question below.</p>
         </div>
       </div>
     );
@@ -31,25 +31,6 @@ export default function ConversationHistory({ history, onClear, sessionId }) {
 
   return (
     <div className="conversation-history">
-      <div className="conversation-header">
-        <div className="header-info">
-          <h3>💬 Conversation</h3>
-          <span className="message-count">{history.length} message{history.length !== 1 ? 's' : ''}</span>
-          {sessionId && (
-            <span className="session-id" title={`Session: ${sessionId}`}>
-              🔗 Connected
-            </span>
-          )}
-        </div>
-        <button 
-          onClick={onClear} 
-          className="clear-button"
-          title="Start a new conversation"
-        >
-          🗑️ Clear
-        </button>
-      </div>
-
       <div className="messages-container">
         {history.map((item, index) => (
           <div key={index} className="message-pair">

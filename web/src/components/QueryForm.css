@@ -1,83 +1,71 @@
 .query-form-container {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.query-form-container h2 {
-  margin-top: 0;
-  color: #333;
+  /* Styles handled by parent */
 }
 
 .query-form {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .query-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  font-size: 0.95rem;
   font-family: inherit;
-  resize: vertical;
+  resize: none;
+  min-height: 50px;
+  max-height: 200px;
+  line-height: 1.5;
 }
 
 .query-input:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .query-input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .submit-button {
-  padding: 12px 24px;
-  background-color: #4CAF50;
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 50%;
+  font-size: 1.5rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: var(--primary-hover);
 }
 
 .submit-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-.slow-warning {
-  color: #ff9800;
-  font-weight: bold;
-  font-size: 0.9em;
+  opacity: 0.6;
 }
 
 .progress-info {
-  margin-top: 12px;
-  padding: 12px;
-  background-color: #e3f2fd;
-  border-left: 4px solid #2196F3;
-  border-radius: 4px;
+  margin-top: 0.75rem;
+  text-align: center;
 }
 
-.progress-info p {
-  margin: 4px 0;
-  color: #1976D2;
-  font-size: 14px;
-}
-
-.progress-details {
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
+.progress-message {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0;
 }

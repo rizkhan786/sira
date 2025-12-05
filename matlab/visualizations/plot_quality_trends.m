@@ -16,12 +16,42 @@ function fig = plot_quality_trends(episodes, velocity_stats)
 %   fig = plot_quality_trends(episodes, stats);
 
 % Extract data
-timestamps = [episodes.timestamp]';
-quality_scores = [episodes.quality_score]';
+% Convert timestamp strings to numeric (seconds since epoch)
+timestamps = zeros(length(episodes), 1);
+for i = 1:length(episodes)
+    if ischar(episodes(i).timestamp) || isstring(episodes(i).timestamp)
+        % Convert ISO 8601 timestamp to datetime
+        dt = datetime(episodes(i).timestamp, 'InputFormat', 'yyyy-MM-dd''T''HH:mm:ss.SSSSSSXXX', 'TimeZone', 'UTC');
+        timestamps(i) = posixtime(dt);
+    else
+        timestamps(i) = episodes(i).timestamp;
+    end
+end
 
-% Convert timestamps to hours
-first_time = min(timestamps);
-hours = (timestamps - first_time) / 3600;
+% Handle both quality_score and quality_scores
+quality_scores = zeros(length(episodes), 1);
+for i = 1:length(episodes)
+    if isfield(episodes, 'quality_score')
+        quality_scores(i) = episodes(i).quality_score;
+    elseif isfield(episodes, 'quality_scores') && ~isempty(episodes(i).quality_scores)
+        quality_scores(i) = mean(episodes(i).quality_scores);
+    else
+        quality_scores(i) = NaN;
+    end
+end
+
+% Remove NaN values
+valid_idx = ~isnan(quality_scores);
+timestamps = timestamps(valid_idx);
+quality_scores = quality_scores(valid_idx);
+
+% Convert timestamps to hours since first episode
+if ~isempty(timestamps)
+    first_time = min(timestamps);
+    hours = (timestamps - first_time) / 3600;
+else
+    hours = [];
+end
 
 % Create figure
 fig = figure('Position', [100, 100, 800, 500]);

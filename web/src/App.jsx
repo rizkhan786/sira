@@ -58,32 +58,37 @@ function App() {
       <header className="app-header">
         <h1>SIRA</h1>
         <p className="subtitle">Self-Improving Reasoning Agent</p>
+        {sessionId && (
+          <button className="clear-chat-button" onClick={handleClearConversation}>
+            🗑️ New Chat
+          </button>
+        )}
       </header>
 
       <main className="app-main">
-        <div className="left-column">
-          <QueryForm onSubmit={handleQuerySubmit} isLoading={isLoading} />
-          {error && (
-            <div className="error-banner">
-              <strong>Error:</strong> {error}
-            </div>
-          )}
-          <ConversationHistory 
-            history={conversationHistory}
-            onClear={handleClearConversation}
-            sessionId={sessionId}
-          />
+        <div className="chat-column">
+          <div className="conversation-area">
+            <ConversationHistory 
+              history={conversationHistory}
+              onClear={handleClearConversation}
+              sessionId={sessionId}
+            />
+          </div>
+          <div className="input-area">
+            {error && (
+              <div className="error-banner">
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+            <QueryForm onSubmit={handleQuerySubmit} isLoading={isLoading} />
+          </div>
         </div>
 
-        <div className="right-column">
+        <div className="sidebar-column">
           <MetricsDashboard />
           <ReasoningTrace result={result} />
         </div>
       </main>
-
-      <footer className="app-footer">
-        <p>SIRA - Self-Improving Reasoning Agent © 2025</p>
-      </footer>
     </div>
   );
 }

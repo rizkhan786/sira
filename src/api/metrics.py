@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from datetime import datetime
 from src.core.logging import get_logger
+from src.core.redis_cache import get_cache
 
 logger = get_logger(__name__)
 
@@ -136,6 +137,22 @@ async def get_metrics(
         summary=summary,
         trends=trends
     )
+
+
+@router.get("/cache", response_model=Dict[str, Any])
+async def get_cache_stats():
+    """Get Redis cache statistics.
+    
+    Returns:
+        Dictionary with cache stats (hits, misses, hit rate, keys)
+    """
+    try:
+        cache = await get_cache()
+        stats = await cache.get_stats()
+        return stats
+    except Exception as e:
+        logger.error("get_cache_stats_failed", error=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to get cache stats: {str(e)}")
 
 
 @router.get("/patterns/{pattern_id}", response_model=PatternMetricsResponse)

@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     max_reasoning_iterations: int = 3
     min_confidence_threshold: float = 0.7
     pattern_retrieval_count: int = 5
+    fast_mode: bool = False  # Skip heavy reasoning for speed (set to False for full SIRA)
     
     # Database
     postgres_host: str = "postgres"

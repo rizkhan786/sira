@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './QueryForm.css';
 
 export default function QueryForm({ onSubmit, isLoading }) {
   const [query, setQuery] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
+  const textareaRef = useRef(null);
 
   // Timer for elapsed time
   useEffect(() => {
@@ -13,6 +14,11 @@ export default function QueryForm({ onSubmit, isLoading }) {
       interval = setInterval(() => {
         setElapsedTime(prev => prev + 1);
       }, 1000);
+    } else {
+      // Focus textbox when loading completes
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
     }
     return () => clearInterval(interval);
   }, [isLoading]);
@@ -21,6 +27,18 @@ export default function QueryForm({ onSubmit, isLoading }) {
     e.preventDefault();
     if (query.trim()) {
       onSubmit(query);
+      setQuery(''); // Clear input after submission
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    // Submit on Enter (but not Shift+Enter)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (query.trim() && !isLoading) {
+        onSubmit(query);
+        setQuery('');
+      }
     }
   };
 
@@ -32,14 +50,15 @@ export default function QueryForm({ onSubmit, isLoading }) {
 
   return (
     <div className="query-form-container">
-      <h2>Submit Query</h2>
       <form onSubmit={handleSubmit} className="query-form">
         <textarea
+          ref={textareaRef}
           className="query-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter your query here... (e.g., What is 2 + 2?)"
-          rows={4}
+          onKeyDown={handleKeyDown}
+          placeholder="Message SIRA..."
+          rows={1}
           disabled={isLoading}
         />
         <button 
@@ -47,22 +66,14 @@ export default function QueryForm({ onSubmit, isLoading }) {
           className="submit-button"
           disabled={isLoading || !query.trim()}
         >
-          {isLoading ? (
-            <span>
-              Processing... {formatTime(elapsedTime)}
-              {elapsedTime > 30 && <span className="slow-warning"> (Taking longer than usual)</span>}
-            </span>
-          ) : 'Submit Query'}
+          {isLoading ? '...' : '↑'}
         </button>
-        {isLoading && (
-          <div className="progress-info">
-            <p>⏳ SIRA is thinking... This may take up to 5 minutes for complex queries.</p>
-            <p className="progress-details">
-              Elapsed: {formatTime(elapsedTime)} / 5:00 max
-            </p>
-          </div>
-        )}
       </form>
+      {isLoading && (
+        <div className="progress-info">
+          <p className="progress-message">⏳ Thinking... {formatTime(elapsedTime)} / 5:00</p>
+        </div>
+      )}
     </div>
   );
 }

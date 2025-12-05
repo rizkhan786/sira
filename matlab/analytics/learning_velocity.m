@@ -31,13 +31,32 @@ if isempty(episodes)
     error('No episodes provided');
 end
 
-if ~isfield(episodes, 'timestamp') || ~isfield(episodes, 'quality_score')
-    error('Episodes must have timestamp and quality_score fields');
+if ~isfield(episodes, 'timestamp')
+    error('Episodes must have timestamp field');
+end
+
+% Handle both quality_score (singular) and quality_scores (plural/array)
+if ~isfield(episodes, 'quality_score') && ~isfield(episodes, 'quality_scores')
+    error('Episodes must have quality_score or quality_scores field');
 end
 
 % Extract timestamps and quality scores
 timestamps = [episodes.timestamp]';
-quality_scores = [episodes.quality_score]';
+
+% Extract quality scores - handle both formats
+if isfield(episodes, 'quality_score')
+    quality_scores = [episodes.quality_score]';
+else
+    % quality_scores is an array - take the mean
+    quality_scores = zeros(length(episodes), 1);
+    for i = 1:length(episodes)
+        if ~isempty(episodes(i).quality_scores)
+            quality_scores(i) = mean(episodes(i).quality_scores);
+        else
+            quality_scores(i) = NaN;
+        end
+    end
+end
 
 % Convert timestamps to hours since first episode
 first_time = min(timestamps);

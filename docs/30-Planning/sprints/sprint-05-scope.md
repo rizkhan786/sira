@@ -32,10 +32,84 @@ This sprint is **100% focused on benchmark validation**. We're proving that SIRA
 
 ## Sprint Deliverables
 
-### Core Deliverables (8 Total - Benchmark Focus)
+### Core Deliverables (9 Total - Benchmark Focus)
+
+**NEW: DEL-036 added (2025-12-05) - lm-evaluation-harness integration for industry-standard benchmarking**
+
+#### DEL-036: lm-evaluation-harness Integration ⭐ NEW
+**Priority:** Must Have  
+**Estimated Effort:** 2 days  
+**Dependencies:** None
+
+**Scope:**
+- Integrate industry-standard `lm-evaluation-harness` library
+- Create SIRA adapter implementing lm-eval API
+- Support 200+ pre-integrated benchmarks (MMLU, GSM8K, HumanEval, etc.)
+- One-command execution: `lm_eval --model sira --tasks mmlu,gsm8k`
+- Automated comparison with published baselines
+
+**Why This First:**
+- ✅ Industry standard (used by HuggingFace, OpenAI)
+- ✅ Pre-validated datasets and scoring
+- ✅ Published baselines for 50+ models
+- ✅ Replaces need to build custom runners (DEL-040, DEL-041)
+- ✅ Instant credibility with research community
+
+**Acceptance Criteria:**
+- AC-091: SIRA adapter implements lm-eval API interface
+- AC-092: Successfully runs MMLU benchmark via lm-eval
+- AC-093: Comparison report includes baseline scores (GPT-4, Claude, LLaMA)
+- AC-094: Results match manual validation (>95% agreement)
+- AC-095: Can run any lm-eval benchmark via CLI
+
+**Implementation:**
+```python
+# src/benchmarks/lm_eval_adapter.py
+from lm_eval.api.model import LM
+from lm_eval.api.registry import register_model
+
+@register_model("sira")
+class SIRAEvaluator(LM):
+    def generate_until(self, requests):
+        # Call SIRA API for each request
+        pass
+    
+    def loglikelihood(self, requests):
+        # Map SIRA quality scores to log-likelihood
+        pass
+```
+
+**Usage:**
+```bash
+# Run MMLU (15,908 questions)
+lm_eval --model sira --tasks mmlu --output_path results/
+
+# Run GSM8K
+lm_eval --model sira --tasks gsm8k --output_path results/
+
+# Run multiple benchmarks
+lm_eval --model sira --tasks mmlu,gsm8k,hellaswag --output_path results/
+```
+
+**Output:**
+```
+MMML Results:
+  Overall Accuracy: 78.2%
+  
+Comparison to Baselines:
+  GPT-4: 86.4% (+8.2% vs SIRA)
+  Claude-3: 85.0% (+6.8% vs SIRA)
+  GPT-3.5: 70.0% (-8.2% vs SIRA)
+  
+Positioning: SIRA performs between GPT-3.5 and GPT-4
+```
+
+**Note:** This deliverable may replace DEL-040 and DEL-041 as it provides the same functionality via industry-standard library.
+
+---
 
 #### DEL-040: Standard Benchmark Runner (HumanEval & GSM8K)
-**Priority:** Must Have  
+**Priority:** Should Have (Optional if DEL-036 sufficient)  
 **Estimated Effort:** 2 days  
 **Dependencies:** None
 
@@ -249,29 +323,39 @@ Bottom 5 MMLU: [list]
 
 ## Sprint Metrics
 
-**Total Deliverables:** 8 (4 Must Have benchmarks + 4 supporting)  
-**Total Acceptance Criteria:** 29  
-**Estimated Effort:** 15 days (slightly over 14-day sprint)
+**Total Deliverables:** 9 (5 Must Have benchmarks + 4 supporting)  
+**Total Acceptance Criteria:** 34 (29 original + 5 from DEL-036)  
+**Estimated Effort:** 17 days (3 days over 14-day sprint)
 
 ### Priority Breakdown
-- **Must Have (Benchmarks):** 4 deliverables (DEL-040, 041, 042, 043) - 9 days
-- **Should Have:** 2 deliverables (DEL-026, DEL-036) - 4 days
+- **Must Have (Benchmarks):** 5 deliverables (DEL-036, DEL-040, 041, 042, 043) - 11 days
+  - **Note:** DEL-036 may replace DEL-040/041, reducing to 9 days
+- **Should Have:** 2 deliverables (DEL-026, former DEL-036 renamed) - 4 days
 - **Could Have:** 2 deliverables (DEL-033, DEL-031) - 5 days
 
-### Recommended Sprint Focus
+### Recommended Sprint Focus (Updated 2025-12-05)
 
-**Week 1: Benchmark Execution**
-- **Day 1-2:** DEL-040 - HumanEval & GSM8K runner (build + execute)
-- **Day 3:** Start MMLU execution (STEM subjects running overnight)
-- **Day 4:** Continue MMLU (Humanities subjects)
-- **Day 5:** Continue MMLU (Social Sciences subjects)
-- **Weekend:** Complete MMLU (Other subjects) - leave running
+**Week 1: lm-eval Integration + Benchmark Execution**
+- **Day 1-2:** DEL-036 - lm-evaluation-harness integration (PRIORITY)
+  - Build SIRA adapter for lm-eval API
+  - Test with small MMLU sample
+  - Validate results match manual execution
+- **Day 3-5:** Run benchmarks via lm-eval
+  - MMLU via `lm_eval --model sira --tasks mmlu`
+  - GSM8K via `lm_eval --model sira --tasks gsm8k`
+  - HumanEval via `lm_eval --model sira --tasks humaneval`
+- **Weekend:** Continue benchmark execution if needed
 
-**Week 2: Analysis & Simple Reporting**
+**Week 2: Analysis & Reporting**
 - **Day 8-10:** DEL-042 - Comparison & analysis system
-- **Day 11:** DEL-043 - Simple comparison output (console/JSON/markdown)
-- **Day 12-13:** DEL-026 or DEL-036 (if time permits)
+  - Parse lm-eval output
+  - Compare to published baselines
+  - Statistical analysis
+- **Day 11:** DEL-043 - Comparison output (console/JSON/markdown)
+- **Day 12-13:** DEL-026 (pattern export) if time permits
 - **Day 14:** Final results review, Sprint completion
+
+**Note:** DEL-036 (lm-eval) may replace need for DEL-040/041 (custom runners), saving 3-5 days
 
 **If time permits:**
 - DEL-026, DEL-036 (pattern export, MATLAB integration)

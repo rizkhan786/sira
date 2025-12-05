@@ -2,6 +2,7 @@
 
 import logging
 from typing import Dict, Any, List, Optional
+from src.core.redis_cache import get_cache
 
 logger = logging.getLogger(__name__)
 
@@ -15,15 +16,14 @@ class PatternRetriever:
     WEIGHT_SUCCESS_RATE = 0.15
     WEIGHT_USAGE_COUNT = 0.05
     
-    def __init__(self, pattern_storage, cache_manager=None):
+    def __init__(self, pattern_storage):
         """Initialize pattern retriever.
         
         Args:
             pattern_storage: PatternStorage instance
-            cache_manager: Optional CacheManager for performance
         """
         self.storage = pattern_storage
-        self.cache = cache_manager
+        self.redis_cache = None  # Will be initialized async
         
     async def retrieve_patterns(
         self,
@@ -52,9 +52,13 @@ class PatternRetriever:
             }
         )
         
-        # Check cache first
-        if self.cache:
-            cached = await self.cache.get_patterns(query, n_results, min_quality)
+        # Initialize Redis cache if not already done
+        if self.redis_cache is None:
+            self.redis_cache = await get_cache()
+        
+        # Check Redis cache first
+        if self.redis_cache:
+            cached = await self.redis_cache.get_pattern_retrieval(query, n_results)
             if cached is not None:
                 logger.info(
                     "patterns_from_cache",
@@ -107,8 +111,8 @@ class PatternRetriever:
         )
         
         # Cache the results for next time
-        if self.cache and top_patterns:
-            await self.cache.set_patterns(query, n_results, min_quality, top_patterns)
+        if self.redis_cache and top_patterns:
+            await self.redis_cache.set_pattern_retrieval(query, n_results, top_patterns)
         
         return top_patterns
     

@@ -29,11 +29,23 @@ if isempty(episodes)
 end
 
 % Extract unique domains and pattern types
-all_domains = {episodes.domain};
+% Handle missing domain field gracefully
+all_domains = cell(1, length(episodes));
+for i = 1:length(episodes)
+    if isfield(episodes, 'domain') && ~isempty(episodes(i).domain)
+        all_domains{i} = episodes(i).domain;
+    else
+        all_domains{i} = 'unknown';
+    end
+end
+
 all_patterns = {};
 for i = 1:length(episodes)
     if isfield(episodes(i), 'patterns_used') && ~isempty(episodes(i).patterns_used)
         all_patterns = [all_patterns, episodes(i).patterns_used];
+    elseif isfield(episodes(i), 'pattern_ids') && ~isempty(episodes(i).pattern_ids)
+        % Use pattern_ids if patterns_used not available
+        all_patterns = [all_patterns, episodes(i).pattern_ids];
     end
 end
 
@@ -48,8 +60,16 @@ count_matrix = zeros(n_domains, n_patterns);
 
 % Fill quality matrix
 for i = 1:length(episodes)
-    domain = episodes(i).domain;
-    quality = episodes(i).quality_score;
+    domain = all_domains{i};
+    
+    % Handle both quality_score and quality_scores
+    if isfield(episodes, 'quality_score')
+        quality = episodes(i).quality_score;
+    elseif isfield(episodes, 'quality_scores') && ~isempty(episodes(i).quality_scores)
+        quality = mean(episodes(i).quality_scores);
+    else
+        quality = NaN;
+    end
     
     domain_idx = find(strcmp(unique_domains, domain));
     
